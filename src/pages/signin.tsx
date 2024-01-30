@@ -13,7 +13,7 @@ function SignIn() {
     setPublicKey(new_pk)
   }
 
-  const handleChange = (e: React.FormEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.FormEvent<HTMLTextAreaElement>) => {
     const value = e.currentTarget.value
     setSecret(value)
   }
@@ -25,15 +25,16 @@ function SignIn() {
   
   return (
     <div className='debug flex items-center justify-center h-screen'>
-      <div className=' min-h-80 flex flex-col gap-4 bg-white rounded-md p-4 shadow-md'>
+      <div className=' min-h-80 flex flex-col gap-4 bg-white rounded-md p-8 shadow-md'>
         <h1 className='text-3xl font-bold'>Sign in to your account</h1>
         <p>Mood-Diary connects to the Nostr protocol to provide social features.<br />
           To sign in to your Nostr account, paste your private key below</p>
         <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
-          <input
-            type="text"
+          <textarea
             name="secret key"
             value={sk}
+            className=''
+            rows={3}
             onChange={handleChange}
           />
           <button type="submit">Sign In</button>
