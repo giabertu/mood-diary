@@ -1,3 +1,4 @@
+import { getUnit8ArrayFromHex } from './utils'
 import { generateSecretKey, getPublicKey, Relay } from 'nostr-tools'
 
 let sk = generateSecretKey() // `sk` is a Uint8Array
@@ -15,14 +16,16 @@ class NostrService {
 
   static generateKeyPair(): KeyPair {
     const sk = generateSecretKey()
-
     return {
       sk,
       pk: getPublicKey(sk)
     }
   }
 
-  static getPublicKey(sk: Uint8Array): string {
+  static getPublicKey(sk: Uint8Array | string): string {
+    if (typeof sk === 'string') {
+      sk = getUnit8ArrayFromHex(sk)
+    }
     return getPublicKey(sk)
   }
 
