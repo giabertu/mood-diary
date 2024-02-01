@@ -1,13 +1,26 @@
-import { Failed } from '../globals'
+import { DEFAULT_RELAYS, Failed } from '../globals'
 import { getUnit8ArrayFromHex } from './utils'
-import { generateSecretKey, getPublicKey, Relay } from 'nostr-tools'
+import { generateSecretKey, getPublicKey, Relay, nip19 } from 'nostr-tools'
+import { pool } from './utils'
 
 let sk = generateSecretKey() // `sk` is a Uint8Array
 let pk = getPublicKey(sk) // `pk` is a hex string
 
-type KeyPair = {
+export type KeyPair = {
   sk: Uint8Array,
-  pk: string
+  nsec: `nsec1${string}`,
+  pk: string,
+  npub: `npub1${string}`
+}
+
+type PubKeyPair = {
+  pk: string,
+  npub: `npub1${string}`
+}
+
+type SecKeyPair = {
+  sk: Uint8Array,
+  nsec: `nsec1${string}`
 }
 
 class NostrService {
@@ -16,26 +29,56 @@ class NostrService {
 
   static generateKeyPair(): KeyPair {
     const sk = generateSecretKey()
+    const nsec = nip19.nsecEncode(sk)
+    const pk = getPublicKey(sk)
+    const npub = nip19.npubEncode(pk)
     return {
       sk,
-      pk: getPublicKey(sk)
+      nsec,
+      pk,
+      npub
     }
   }
 
-  static getPublicKey(sk: Uint8Array | string): string | Failed {
-    try {
 
+  static getKeyPair(sk: Uint8Array | string): KeyPair | Failed {
+    try {
+      let nsec:`nsec1${string}`  = 'nsec1'
       if (typeof sk === 'string') {
-        sk = getUnit8ArrayFromHex(sk)
+        if (!sk.startsWith('nsec1')) {
+          sk = getUnit8ArrayFromHex(sk)
+          nsec = nip19.nsecEncode(sk) 
+        } else {
+          nsec = sk as `nsec1${string}`
+          const { type, data } = nip19.decode(nsec)
+          sk = data as Uint8Array
+        } 
+      } else {
+        nsec = nip19.nsecEncode(sk)
       }
-      return getPublicKey(sk)
+      
+      pk = getPublicKey(sk)
+
+      return {
+        sk,
+        nsec,
+        pk,
+        npub: nip19.npubEncode(pk)
+      }
       //error is of type {message, stack}
     } catch (error) {
       return {
         code: 500,
-        message: 'The private key that you provided is not valid. Please try again.'
+        message: 'The private key is either not valid or not in the right format. Make sure it starts with nsec.'
       }
     }
+  }
+
+
+  static checkSkFormat(sk: string) {
+    console.log("sk", sk)
+    const res = nip19.decode(sk)
+    console.log("res", res)
   }
 
 
@@ -56,6 +99,28 @@ class NostrService {
   }
 
 
+  static connectToRelays() {
+    let h = pool.subscribeMany(
+      DEFAULT_RELAYS,
+      [
+      ],
+      {
+        onevent(event) {
+          // this will only be called once the first time the event is received
+          // ...
+          console.log("Received ", event)
+        },
+        oneose() {
+          h.close()
+        }
+      }
+    )
+  }
+
+  static async getProfileEvents(pk: string) {
+    let events = await pool.querySync(DEFAULT_RELAYS, { kinds: [0, 1], authors: [pk] })
+    return events
+  }
 
 
 }

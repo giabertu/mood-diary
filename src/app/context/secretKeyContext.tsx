@@ -1,9 +1,10 @@
 
 
 // AuthContext.js
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import React, { createContext, useState, useContext, ReactNode, SetStateAction, Dispatch} from 'react';
+import { KeyPair } from '../services/NostrService';
 
-const AuthContext = createContext({sk: "", setSecret: (sk: string) => {}});
+const AuthContext = createContext({keyPair: {sk: new Uint8Array(), nsec: '', pk: '', npub: ''}, setKeyPair: (keypair: KeyPair) => {}});
 
 export function useSkContext() {
   return useContext(AuthContext);
@@ -15,12 +16,12 @@ type SecretKeyProviderProps = {
 };
 
 export function SecretKeyProvider({ children }: SecretKeyProviderProps) {
-  const [sk, setSecret] = useState('');
+  const [keyPair, setKeyPair] = useState({sk: new Uint8Array(), nsec: '', pk: '', npub: ''});
 
 
 
   return (
-    <AuthContext.Provider value={{sk, setSecret}}>
+    <AuthContext.Provider value={{keyPair, setKeyPair}}>
       {children}
     </AuthContext.Provider>
   );

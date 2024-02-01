@@ -4,11 +4,14 @@ import "../app/styles/globals.css";
 import { hasFailed } from '@/app/globals';
 import { useSkContext } from '@/app/context/secretKeyContext';
 import { useRouter } from 'next/router';
+import { nip19 } from 'nostr-tools';
+import { getUnit8ArrayFromHex } from '@/app/services/utils';
 
 function SignIn() {
 
 
-  const { sk, setSecret } = useSkContext()
+  const { keyPair, setKeyPair } = useSkContext()
+  const [sk, setSecret] = useState('')
   const [pk, setPublicKey] = useState('')
   const [err, setErr] = useState('')
 
@@ -16,12 +19,13 @@ function SignIn() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const new_pk = NostrService.getPublicKey(sk)
-    console.log(new_pk)
-    if (hasFailed(new_pk)){
-      setErr(new_pk.message)
+    const new_keypair = NostrService.getKeyPair(sk)
+    console.log(new_keypair)
+    if (hasFailed(new_keypair)){
+      setErr(new_keypair.message)
     } else {
-      setPublicKey(new_pk)
+      // setPublicKey(new_keypair.pk)
+      setKeyPair(new_keypair)
       router.push('/profile')
     }
   }
@@ -29,12 +33,26 @@ function SignIn() {
   const handleChange = (e: React.FormEvent<HTMLTextAreaElement>) => {
     const value = e.currentTarget.value
     setSecret(value)
-  }
 
-  console.log({
-    sk,
-    pk
-  })
+    // NostrService.checkSkFormat("39f00b4ba975042f898136d754d9d7b1fe6395ea1827d7ffbfae6d7a94a23521") 
+    // const pk1 = NostrService.getPublicKey("nsec188cqkjafw5zzlzvpxmt4fkwhk8lx8902rqna0lal4ekh499zx5ssaaszf5")
+    // const pk2 = NostrService.getPublicKey("39f00b4ba975042f898136d754d9d7b1fe6395ea1827d7ffbfae6d7a94a23521")
+    // console.log(pk1)
+    // console.log(pk2)
+    // console.log(pk1 === pk2)
+  }
+  
+// Priv key
+// 39f00b4ba975042f898136d754d9d7b1fe6395ea1827d7ffbfae6d7a94a23521
+
+// Nsec:
+// nsec188cqkjafw5zzlzvpxmt4fkwhk8lx8902rqna0lal4ekh499zx5ssaaszf5
+
+  // console.log({
+  //   sk,
+  //   pk
+  // })
+
 
   return (
     <div className='debug flex items-center justify-center h-screen'>
@@ -46,7 +64,7 @@ function SignIn() {
           <textarea
             name="secret key"
             required={true}
-            value={sk}
+            // value={sk}s
             className=''
             rows={3}
             onChange={handleChange}
