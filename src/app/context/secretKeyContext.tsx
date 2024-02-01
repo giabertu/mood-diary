@@ -3,6 +3,7 @@
 // AuthContext.js
 import React, { createContext, useState, useContext, ReactNode, SetStateAction, Dispatch, useEffect } from 'react';
 import { KeyPair } from '../services/NostrService';
+import { useRouter } from 'next/router';
 
 const AuthContext = createContext({ keyPair: { sk: new Uint8Array(), nsec: '', pk: '', npub: '' }, setKeyPair: (keypair: KeyPair) => { } });
 
@@ -17,13 +18,15 @@ type SecretKeyProviderProps = {
 
 export function SecretKeyProvider({ children }: SecretKeyProviderProps) {
   const [keyPair, setKeyPair] = useState({ sk: new Uint8Array(), nsec: '', pk: '', npub: '' });
+  const router = useRouter()
 
   useEffect(() => {
-    const keyPair = localStorage.getItem('keyPair')
-    if (keyPair) {
-      setKeyPair(JSON.parse(keyPair))
-    }
+    const storedKeys = localStorage.getItem('keyPair')
+    if (storedKeys) {
+      setKeyPair(JSON.parse(storedKeys))
+    } 
   }, [])
+
 
   return (
     <AuthContext.Provider value={{ keyPair, setKeyPair }}>
@@ -31,4 +34,3 @@ export function SecretKeyProvider({ children }: SecretKeyProviderProps) {
     </AuthContext.Provider>
   );
 }
-

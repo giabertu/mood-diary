@@ -33,8 +33,10 @@ function SignIn() {
   }
 
   useEffect(() => {
-    if (localStorage.getItem('keyPair') !== null){
+    const storedKeys = localStorage.getItem('keyPair')
+    if (storedKeys !== null){
       router.push('/profile')
+      setKeyPair(JSON.parse(storedKeys))
     }
   }, [])
 

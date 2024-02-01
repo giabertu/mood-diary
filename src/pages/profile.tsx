@@ -1,5 +1,5 @@
 import { useSkContext } from "@/app/context/secretKeyContext"
-import { hasFailed } from "@/app/globals";
+import { DEFAULT_KEYPAIR, hasFailed } from "@/app/globals";
 import { NostrService } from "@/app/services/NostrService"
 import { useRouter } from "next/router";
 import { useEffect } from "react";
@@ -18,7 +18,8 @@ function Profile() {
 
 
   useEffect(() => {
-    if (localStorage.getItem('keyPair') === null){
+    if (localStorage.getItem('keyPair') === null) {
+      setKeyPair(DEFAULT_KEYPAIR)
       router.push('/signin')
     }
   }, [])
@@ -27,6 +28,14 @@ function Profile() {
     <>
       <h1>Profile</h1>
       {keyPair && <p>KeyPair: {JSON.stringify(keyPair)}</p>}
+      <button onClick={() => {
+        localStorage.removeItem('keyPair')
+        setKeyPair(DEFAULT_KEYPAIR)
+        router.push('/signin')
+
+      }}>
+        Sign out
+      </button>
     </>
   )
 
