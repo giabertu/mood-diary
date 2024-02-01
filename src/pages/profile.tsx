@@ -1,10 +1,13 @@
 import { useSkContext } from "@/app/context/secretKeyContext"
 import { hasFailed } from "@/app/globals";
 import { NostrService } from "@/app/services/NostrService"
+import { useRouter } from "next/router";
+import { useEffect } from "react";
 
 function Profile() {
 
   const { keyPair, setKeyPair } = useSkContext()
+  const router = useRouter()
 
   // getEvents()
   async function getProfile() {
@@ -13,6 +16,12 @@ function Profile() {
   }
   getProfile()
 
+
+  useEffect(() => {
+    if (localStorage.getItem('keyPair') === null){
+      router.push('/signin')
+    }
+  }, [])
 
   return (
     <>
