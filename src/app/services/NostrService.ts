@@ -1,3 +1,4 @@
+import { Failed } from '../globals'
 import { getUnit8ArrayFromHex } from './utils'
 import { generateSecretKey, getPublicKey, Relay } from 'nostr-tools'
 
@@ -8,7 +9,6 @@ type KeyPair = {
   sk: Uint8Array,
   pk: string
 }
-
 
 class NostrService {
 
@@ -22,12 +22,22 @@ class NostrService {
     }
   }
 
-  static getPublicKey(sk: Uint8Array | string): string {
-    if (typeof sk === 'string') {
-      sk = getUnit8ArrayFromHex(sk)
+  static getPublicKey(sk: Uint8Array | string): string | Failed {
+    try {
+
+      if (typeof sk === 'string') {
+        sk = getUnit8ArrayFromHex(sk)
+      }
+      return getPublicKey(sk)
+      //error is of type {message, stack}
+    } catch (error) {
+      return {
+        code: 500,
+        message: 'The private key that you provided is not valid. Please try again.'
+      }
     }
-    return getPublicKey(sk)
   }
+
 
   static async connectToRelay(url: string) {
     const relay = await Relay.connect(url)

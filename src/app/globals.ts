@@ -7,3 +7,13 @@ const DEFAULT_RELAYS = [
 export {
   DEFAULT_RELAYS,
 }
+
+export type Failed = {
+  code: number,
+  message: string
+}
+
+
+export function hasFailed(res: any | Failed): res is Failed{
+  return (typeof res === 'object' && "code" in res && "message" in res)
+}

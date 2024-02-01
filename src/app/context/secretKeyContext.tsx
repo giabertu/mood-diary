@@ -3,7 +3,7 @@
 // AuthContext.js
 import React, { createContext, useState, useContext, ReactNode } from 'react';
 
-const AuthContext = createContext({sk: "", signIn: (sk: string) => {}});
+const AuthContext = createContext({sk: "", setSecret: (sk: string) => {}});
 
 export function useSkContext() {
   return useContext(AuthContext);
@@ -15,15 +15,12 @@ type SecretKeyProviderProps = {
 };
 
 export function SecretKeyProvider({ children }: SecretKeyProviderProps) {
-  const [sk, setSk] = useState('');
+  const [sk, setSecret] = useState('');
 
-  const signIn = (newSk: string) => {
-    setSk(newSk);
-  };
 
 
   return (
-    <AuthContext.Provider value={{sk, signIn}}>
+    <AuthContext.Provider value={{sk, setSecret}}>
       {children}
     </AuthContext.Provider>
   );
