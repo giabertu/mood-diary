@@ -44,7 +44,7 @@ function SignIn() {
   }, [])
 
   return (
-    <div className='debug flex items-center justify-center h-screen'>
+    <div className='flex w-screen debug items-center justify-center h-screen'>
       <div className=' min-h-80 flex flex-col gap-4 bg-white rounded-md p-8 shadow-md max-w-[45rem]'>
         {showCreateAccount ?
           <CreateAccount /> :
@@ -57,7 +57,7 @@ function SignIn() {
                 name="secret key"
                 required={true}
                 value={sk}
-                className=''
+                className='p-2 border border-gray-300 rounded-md'
                 rows={3}
                 onChange={handleChange}
               />

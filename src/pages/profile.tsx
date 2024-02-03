@@ -1,10 +1,10 @@
 import { useSkContext } from "@/app/context/secretKeyContext"
 import { DEFAULT_KEYPAIR, hasFailed } from "@/app/globals";
 import { NostrService } from "@/app/services/NostrService"
-import { randomInt } from "crypto";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useState } from "react";
+import Image from 'next/image'
 
 type UserProfile = {
   banner: string;
@@ -47,12 +47,10 @@ function Profile() {
       setProfile(JSON.parse(actualProfile[0]?.content))
       console.log({ actualEvents })
     }
-    if (keyPair.pk){
+    if (keyPair.pk) {
       getProfile()
     }
   }, [keyPair])
-
-
 
 
   useEffect(() => {
@@ -64,14 +62,28 @@ function Profile() {
 
   return (
     <>
-      <div className="border border-gray-300 p-2">
+      <div className="border border-gray-300 h-full p-2">
         <div>
-          <img src={profile.picture ? profile.picture : `/avatar-${Math.floor(Math.random()*2 + 1)}.webp`} alt="profile picture" className="w-20 rounded-full" />
+          <div className="relative flex flex-col debug">
+            <img src={profile.banner ? profile.banner : `/banner.jpg`} alt="banner" className="w-full" />
+            <div className="w-36 h-36 rounded-full justify-self-center absolute bottom-2 overflow-hidden flex items-center justify-center">
+              <img
+                src={profile.picture ? profile.picture : `/icon.svg`}
+                alt="profile picture"
+                className="absolute w-full h-full object-cover"
+                style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+              />
+
+            </div>
+            <div className="flex justify-end items-center debug w-full min-h-20">
+              <button className="border border-gray-300 rounded-3xl p-2">edit profile</button>
+            </div>
+          </div>
           <h1>{profile.display_name}</h1>
           <p>{profile.about}</p>
         </div>
         <h1>Profile</h1>
-        {keyPair && <p>KeyPair: {JSON.stringify(keyPair)}</p>}
+        {/* {keyPair && <p>KeyPair: {JSON.stringify(keyPair)}</p>} */}
         <button onClick={() => {
           localStorage.removeItem('keyPair')
           setKeyPair(DEFAULT_KEYPAIR)
@@ -87,3 +99,6 @@ function Profile() {
 }
 
 export default Profile
+
+
+// avatar-${Math.floor(Math.random()*2 + 1)}.webp

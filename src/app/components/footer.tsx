@@ -10,7 +10,7 @@ function Footer() {
   //hide in signin page
   if (router.asPath.includes("/signin")) return null 
 
-  return <div>Ciao Footer</div>
+  return <div className=" h-[10%]">Ciao Footer</div>
 }
 
 export default Footer 
