@@ -11,7 +11,7 @@ function Tabs() {
 
 
   return (
-    <div className='w-1/4'>
+    <div className='w-1/4 border border-gray-300 h-full p-2 border-r-0'>
       Tabs
     </div>
   )

@@ -11,7 +11,7 @@ function Sidebar() {
 
 
 
-  return <div className='w-1/5'>
+  return <div className='w-1/5 border border-gray-300 border-l-0 h-full p-2'>
     Sidebar Right
   </div>
 
