@@ -2,6 +2,7 @@ import { DEFAULT_RELAYS, Failed } from '../globals'
 import { getUnit8ArrayFromHex } from './utils'
 import { generateSecretKey, getPublicKey, Relay, nip19 } from 'nostr-tools'
 import { pool } from './utils'
+import { Event } from 'nostr-tools'
 
 let sk = generateSecretKey() // `sk` is a Uint8Array
 let pk = getPublicKey(sk) // `pk` is a hex string
@@ -22,6 +23,7 @@ type SecKeyPair = {
   sk: Uint8Array,
   nsec: `nsec1${string}`
 }
+
 
 class NostrService {
 
@@ -127,6 +129,17 @@ class NostrService {
   static async getProfileInfo(pk: string) {
     let info = await pool.querySync(DEFAULT_RELAYS, { kinds: [0], authors: [pk] })
     return info
+  }
+
+  static async publishEvent(newEvent: Event) {
+    try {
+      const res = await Promise.all(pool.publish(DEFAULT_RELAYS, newEvent))
+      console.log('published to at least one relay! ', res)
+      return true
+    } catch (error) {
+      console.error('Error: ', error)
+      return false
+    }
   }
 
 

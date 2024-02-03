@@ -12,9 +12,13 @@ function Profile() {
   // getEvents()
   async function getProfile() {
     const events = await NostrService.getProfileEvents('72c3b924c01e2bc4a75f042bf53bc86670a52fac4d32e563ec166271fbba5141')
+    const actualEvents = await NostrService.getProfileEvents(keyPair.pk)
     const profile = await NostrService.getProfileInfo('72c3b924c01e2bc4a75f042bf53bc86670a52fac4d32e563ec166271fbba5141')
+    const actualProfile = await NostrService.getProfileInfo(keyPair.pk)
     console.log(events)
     console.log(profile)
+    console.log({ actualProfile })
+    console.log({ actualEvents })
   }
   getProfile()
 
