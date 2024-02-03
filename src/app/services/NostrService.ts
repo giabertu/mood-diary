@@ -50,6 +50,7 @@ class NostrService {
           nsec = nip19.nsecEncode(sk) 
         } else {
           nsec = sk as `nsec1${string}`
+
           const { type, data } = nip19.decode(nsec)
           sk = data as Uint8Array
         } 
@@ -67,6 +68,7 @@ class NostrService {
       }
       //error is of type {message, stack}
     } catch (error) {
+      console.error("Error: ", error)
       return {
         code: 500,
         message: 'The private key is either not valid or not in the right format. Make sure it starts with nsec.'
@@ -120,6 +122,11 @@ class NostrService {
   static async getProfileEvents(pk: string) {
     let events = await pool.querySync(DEFAULT_RELAYS, { kinds: [0, 1], authors: [pk] })
     return events
+  }
+
+  static async getProfileInfo(pk: string) {
+    let info = await pool.querySync(DEFAULT_RELAYS, { kinds: [0], authors: [pk] })
+    return info
   }
 
 
