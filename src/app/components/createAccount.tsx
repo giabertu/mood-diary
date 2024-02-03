@@ -32,10 +32,9 @@ function CreateAccount() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    //create the event
 
     let event = finalizeEvent({
-      kind: 1,
+      kind: 0,
       created_at: Math.floor(Date.now() / 1000),
       tags: [],
       content: JSON.stringify({ name, about, display_name })
@@ -104,12 +103,6 @@ function CreateAccount() {
 
             <button type="submit">Log me in</button>
           </form>
-          {/* 
-          <button onClick={() => {
-            localStorage.setItem('keyPair', JSON.stringify(keyPair))
-            router.push('/profile')
-
-          }}>I wrote them down, log me in!</button> */}
         </div>
       }
       {err && <p className='text-red-500'>{err}</p>}
