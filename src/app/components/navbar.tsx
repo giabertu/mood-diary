@@ -10,7 +10,7 @@ function Navbar() {
   //hide in signin page
   if (router.asPath.includes("/signin")) return null 
 
-  return <div className="debug h-[10%]">Ciao Navbar</div>
+  return <div className="debug sticky top-0 z-10 h-20 w-full flex justify-center">Ciao Navbar</div>
 }
 
 export default Navbar

@@ -11,7 +11,7 @@ type LayoutProps = {
 
 function Layout({ children }: LayoutProps) {
   return (
-    <div className='h-screen flex flex-col justify-start items-center'>
+    <div className='h-full flex flex-col justify-start items-center'>
       <Navbar />
       <div className='flex w-full h-4/5'>
         <Tabs />

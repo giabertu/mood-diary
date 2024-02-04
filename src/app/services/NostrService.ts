@@ -125,6 +125,11 @@ class NostrService {
     let events = await pool.querySync(DEFAULT_RELAYS, { authors: [pk] })
     return events
   }
+  
+  static async getProfilePosts(pk: string) {
+    let posts = await pool.querySync(DEFAULT_RELAYS, { kinds: [1], authors: [pk] })
+    return posts
+  }
 
   static async getProfileRelays(pk: string) {
     let relays = await pool.querySync(DEFAULT_RELAYS, { kinds: [3], authors: [pk] })
