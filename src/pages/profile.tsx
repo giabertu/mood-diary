@@ -17,6 +17,7 @@ type UserProfile = {
   display_name: string;
   about: string;
   name: string;
+  created_at: number;
 }
 
 const DEFAULT_PROFILE: UserProfile = {
@@ -26,9 +27,10 @@ const DEFAULT_PROFILE: UserProfile = {
   nip05: '',
   picture: '',
   lud16: '',
-  display_name: '',
-  about: '',
-  name: '',
+  display_name: 'Satoshi Nakamoto',
+  about: 'Read my whitepaper',
+  name: 'satoshi',
+  created_at: 0
 }
 
 
@@ -45,7 +47,8 @@ function Profile() {
       // const actualEvents = await NostrService.getProfileEvents(keyPair.pk)
       const actualProfile = await NostrService.getProfileInfo(keyPair.pk)
       console.log({ actualProfile })
-      setProfile(JSON.parse(actualProfile[0]?.content))
+      const parsedProfile = JSON.parse(actualProfile[0]?.content)
+      setProfile({ ...parsedProfile, created_at: actualProfile[0]?.created_at })
       // console.log({ actualEvents })
       const userRelays = await NostrService.getProfileRelays(keyPair.pk)
       console.log({ relays: JSON.parse(userRelays[0].content) })
@@ -63,6 +66,24 @@ function Profile() {
     }
   }, [keyPair])
 
+  const getDate = (timestamp: number) => {
+    //if older than 48h ago:
+    const now = Math.floor(Date.now() / 1000)
+    if (timestamp < now - 48 * 60 * 60) {
+      return new Date(timestamp * 1000).toLocaleDateString()
+    } else {
+      if (timestamp < now - 60 * 60) {
+        return Math.floor((now - timestamp) / 60 / 60) + 'h ago'
+      }
+      if (timestamp < now - 60) {
+        return Math.floor((now - timestamp) / 60) + 'm ago'
+      }
+      if (timestamp < now) {
+        return Math.floor((now - timestamp)) + 's ago'
+      }
+    }
+
+  }
 
   useEffect(() => {
     if (localStorage.getItem('keyPair') === null) {
@@ -82,9 +103,9 @@ function Profile() {
 
   return (
     <>
-      <div className="border border-gray-300 h-full p-2 debug flex flex-col gap-2">
+      <div className="border border-gray-300 h-full p-2  flex flex-col gap-2">
         <div className="flex flex-col justify-between gap-1">
-          <div className="relative flex flex-col debug">
+          <div className="relative flex flex-col ">
             <img src={profile.banner ? profile.banner : `/banner.jpg`} alt="banner" className="w-full" />
             <div className="w-36 h-36 rounded-full justify-self-center absolute bottom-2 overflow-hidden flex items-center justify-center">
               <img
@@ -94,18 +115,23 @@ function Profile() {
                 style={{ objectFit: 'cover', width: '100%', height: '100%' }}
               />
             </div>
-            <div className="flex justify-end items-center debug w-full min-h-20">
+            <div className="flex justify-end items-center  w-full min-h-20">
               <button className="border border-gray-300 rounded-3xl p-2">edit profile</button>
             </div>
           </div>
-
-          <h1 className=" font-bold text-lg ">{profile.display_name}</h1>
+          <div className="flex w-full justify-between">
+            <div className="flex gap-4 items-center">
+              <h1 className=" font-bold text-lg ">{profile.display_name}</h1>
+              <p className="text-gray-500">{profile.name}</p>
+            </div>
+            <p className="text-gray-500 text-sm">{"joined " + getDate(profile.created_at)}</p>
+          </div>
           <div className="flex gap-2 text-sm text-gray-500 items-center">
             <p>{keyPair.npub.slice(0, 8) + '...' + keyPair.npub.slice(-5)}</p>
             <DocumentDuplicateIcon onClick={() => copyToClipboard(keyPair.npub)} className="h-4 w-4" />
           </div>
 
-          <p className="text-sm">I love being outside and drinking sunlight. I dislike wearing shoes. Host of #AnotherFuckingBitcoinPodcast https://bitcoinpodcast.net/ Creator of The Nostrich, #Footstr, & #StopThePresses 🛑 Popularized #Zapvertising ⚡️ Bitcoin & Nostr give me hope.</p>
+          <p className="text-sm" style={{ whiteSpace: "pre-line" }}>{profile.about}</p>
         </div>
 
 
@@ -120,9 +146,9 @@ function Profile() {
     "tags": []
 } */}
         <div className="flex flex-col w-full">
-          {posts.map(post =>
-            <div className="flex gap-2 p-2">
-              <div className="w-6 h-6 rounded-full flex-shrink-0 justify-self-center overflow-hidden debug">
+          {posts.map((post, i) =>
+            <div className={`flex gap-2 py-4 px-2  ${i !== posts.length - 1 && "border border-gray-300 border-t-0 border-x-0"}`}>
+              <div className="w-12 h-12 rounded-full flex-shrink-0 justify-self-center overflow-hidden ">
                 <img
                   src={profile.picture ? profile.picture : `/icon.svg`}
                   alt="profile picture"
@@ -130,13 +156,15 @@ function Profile() {
                   style={{ objectFit: 'cover', width: '100%', height: '100%' }}
                 />
               </div>
-              <div className="flex flex-col debug">
-                <div className="flex gap-2 text-sm">
-                  <p className="font-bold">{profile.display_name}</p>
-                  <p className="text-gray-500">{profile.name}</p>
-                  <p>{post.created_at}</p>
+              <div className="flex flex-col  flex-grow">
+                <div className="flex gap-2 text-sm flex-grow justify-between ">
+                  <div className="flex gap-2">
+                    <p className="font-bold">{profile.display_name}</p>
+                    <p className="text-gray-500">{profile.name}</p>
+                  </div>
+                  <p className=" justify-self-end text-gray-500">{getDate(post.created_at)}</p>
                 </div>
-                <p>{post.content}</p>
+                <p style={{ whiteSpace: 'pre-wrap' }}>{post.content}</p>
               </div>
             </div>
 
