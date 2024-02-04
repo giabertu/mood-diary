@@ -22,3 +22,7 @@ export type Failed = {
 export function hasFailed(res: any | Failed): res is Failed {
   return (typeof res === 'object' && "code" in res && "message" in res)
 }
+
+export function isValidPk (pk: string) {
+  return pk.length === 64
+}

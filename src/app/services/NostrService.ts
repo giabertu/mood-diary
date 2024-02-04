@@ -1,4 +1,4 @@
-import { DEFAULT_RELAYS, Failed } from '../globals'
+import { DEFAULT_RELAYS, Failed, isValidPk } from '../globals'
 import { getUnit8ArrayFromHex } from './utils'
 import { generateSecretKey, getPublicKey, Relay, nip19 } from 'nostr-tools'
 import { pool } from './utils'
@@ -122,8 +122,24 @@ class NostrService {
   }
 
   static async getProfileEvents(pk: string) {
-    let events = await pool.querySync(DEFAULT_RELAYS, { kinds: [0, 1], authors: [pk] })
+    let events = await pool.querySync(DEFAULT_RELAYS, { authors: [pk] })
     return events
+  }
+
+  static async getProfileRelays(pk: string) {
+    let relays = await pool.querySync(DEFAULT_RELAYS, { kinds: [3], authors: [pk] })
+    return relays
+  }
+
+  static async getProfileFollowers(pk: string) {
+    let followers = await pool.querySync(DEFAULT_RELAYS, {kinds: [3], "#p": [pk]})
+    return followers
+  }
+
+  static async getProfileFollowing(pk: string) {
+    let kind3 = await pool.querySync(DEFAULT_RELAYS, {kinds: [3], authors: [pk]})
+    let following = kind3[0].tags.filter((arrString: string[]) => isValidPk(arrString[1]) && arrString[1])
+    return following
   }
 
   static async getProfileInfo(pk: string) {
