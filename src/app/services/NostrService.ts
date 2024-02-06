@@ -126,6 +126,7 @@ class NostrService {
     return events
   }
 
+  //returns posts (not replies to posts) in cronological order
   static async getProfilePosts(pk: string) {
     let posts = await pool.querySync(DEFAULT_RELAYS, { kinds: [1], authors: [pk] })
     const mainPosts = posts.filter(post => {
@@ -133,7 +134,7 @@ class NostrService {
       if (post.tags.length === 0) return true //no replies
       return post.tags[0][0] !== 'e' //not mentioning other events (a post is an event)
     })
-    return mainPosts
+    return mainPosts.toSorted((a: Event, b: Event) => b.created_at - a.created_at)
   }
 
   static async getProfileRelays(pk: string) {
