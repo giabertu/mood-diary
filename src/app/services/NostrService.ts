@@ -45,21 +45,21 @@ class NostrService {
 
   static getKeyPair(sk: Uint8Array | string): KeyPair | Failed {
     try {
-      let nsec:`nsec1${string}`  = 'nsec1'
+      let nsec: `nsec1${string}` = 'nsec1'
       if (typeof sk === 'string') {
         if (!sk.startsWith('nsec1')) {
           sk = getUnit8ArrayFromHex(sk)
-          nsec = nip19.nsecEncode(sk) 
+          nsec = nip19.nsecEncode(sk)
         } else {
           nsec = sk as `nsec1${string}`
 
           const { type, data } = nip19.decode(nsec)
           sk = data as Uint8Array
-        } 
+        }
       } else {
         nsec = nip19.nsecEncode(sk)
       }
-      
+
       pk = getPublicKey(sk)
 
       return {
@@ -125,10 +125,15 @@ class NostrService {
     let events = await pool.querySync(DEFAULT_RELAYS, { authors: [pk] })
     return events
   }
-  
+
   static async getProfilePosts(pk: string) {
     let posts = await pool.querySync(DEFAULT_RELAYS, { kinds: [1], authors: [pk] })
-    return posts
+    const mainPosts = posts.filter(post => {
+      console.log("post", post)
+      if (post.tags.length === 0) return true //no replies
+      return post.tags[0][0] !== 'e' //not mentioning other events (a post is an event)
+    })
+    return mainPosts
   }
 
   static async getProfileRelays(pk: string) {
@@ -137,12 +142,12 @@ class NostrService {
   }
 
   static async getProfileFollowers(pk: string) {
-    let followers = await pool.querySync(DEFAULT_RELAYS, {kinds: [3], "#p": [pk]})
+    let followers = await pool.querySync(DEFAULT_RELAYS, { kinds: [3], "#p": [pk] })
     return followers
   }
 
   static async getProfileFollowing(pk: string) {
-    let kind3 = await pool.querySync(DEFAULT_RELAYS, {kinds: [3], authors: [pk]})
+    let kind3 = await pool.querySync(DEFAULT_RELAYS, { kinds: [3], authors: [pk] })
     let following = kind3[0].tags.filter((arrString: string[]) => isValidPk(arrString[1]) && arrString[1])
     return following
   }

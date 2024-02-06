@@ -73,7 +73,9 @@ function Profile() {
       return new Date(timestamp * 1000).toLocaleDateString()
     } else {
       if (timestamp < now - 60 * 60) {
-        return Math.floor((now - timestamp) / 60 / 60) + 'h ago'
+        const hrs = Math.floor((now - timestamp) / 60 / 60)
+        if (hrs > 24) return Math.floor(hrs / 24) + 'd ago'
+        return hrs + 'h ago'
       }
       if (timestamp < now - 60) {
         return Math.floor((now - timestamp) / 60) + 'm ago'
