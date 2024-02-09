@@ -46,14 +46,7 @@ function Profile() {
 
   useEffect(() => {
     async function getProfile() {
-
-      const actualProfile = await NostrService.getProfileInfo(keyPair.pk)
-      console.log({ actualProfile })
-      const parsedProfile = JSON.parse(actualProfile[0]?.content)
-      setProfile({ ...parsedProfile, created_at: actualProfile[0]?.created_at })
-      const userRelays = await NostrService.getProfileRelays(keyPair.pk)
-      console.log({ relays: JSON.parse(userRelays[0].content) })
-      console.log({ kind3: userRelays })
+      console.log("pub key is", keyPair.pk)
       const new_posts = await NostrService.getProfilePosts(keyPair.pk)
       console.log({ new_posts })
       setPosts(new_posts)
@@ -114,7 +107,7 @@ function Profile() {
 
         {/* feed */}
         <div className="flex flex-col w-full">
-          {posts.map((post, i) => <Post post={post} profile={profile} addBorder={i !== posts.length - 1}/>)}
+          {posts.map((post, i) => <Post key={post.id} post={post} profile={profile} addBorder={i !== posts.length - 1} />)}
         </div>
       </div>
     </>

@@ -29,6 +29,7 @@ function PostPage() {
       if (id && typeof id === 'string') {
         const post = await NostrService.getPost(id)
         if (post[0].pubkey === keyPair.pk) {
+          console.log({profile})
           setNewProfile(profile)
         } else {
           const new_prof = await NostrService.getProfileInfo(post[0].pubkey)
@@ -39,7 +40,7 @@ function PostPage() {
       }
     }
     getPost()
-  }, [router.query.id])
+  }, [router.query.id, profile])
 
 
 
