@@ -1,13 +1,14 @@
 import { useSkContext } from "@/app/context/secretKeyContext"
-import { DEFAULT_KEYPAIR, hasFailed } from "@/app/globals";
+import { DEFAULT_KEYPAIR, getDate, hasFailed } from "@/app/globals";
 import { NostrService } from "@/app/services/NostrService"
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useState } from "react";
 import { DocumentDuplicateIcon } from "@heroicons/react/24/outline";
 import { Event } from 'nostr-tools'
+import Post from "@/app/components/post";
 
-type UserProfile = {
+export type UserProfile = {
   banner: string;
   website: string;
   lud06: string;
@@ -44,19 +45,13 @@ function Profile() {
   useEffect(() => {
     async function getProfile() {
 
-      // const actualEvents = await NostrService.getProfileEvents(keyPair.pk)
       const actualProfile = await NostrService.getProfileInfo(keyPair.pk)
       console.log({ actualProfile })
       const parsedProfile = JSON.parse(actualProfile[0]?.content)
       setProfile({ ...parsedProfile, created_at: actualProfile[0]?.created_at })
-      // console.log({ actualEvents })
       const userRelays = await NostrService.getProfileRelays(keyPair.pk)
       console.log({ relays: JSON.parse(userRelays[0].content) })
       console.log({ kind3: userRelays })
-      // const followers = await NostrService.getProfileFollowers(keyPair.pk)
-      // console.log({ followers })
-      // const following = await NostrService.getProfileFollowing(keyPair.pk)
-      // console.log({ following })
       const new_posts = await NostrService.getProfilePosts(keyPair.pk)
       console.log({ new_posts })
       setPosts(new_posts)
@@ -65,27 +60,6 @@ function Profile() {
       getProfile()
     }
   }, [keyPair])
-
-  const getDate = (timestamp: number) => {
-    //if older than 48h ago:
-    const now = Math.floor(Date.now() / 1000)
-    if (timestamp < now - 48 * 60 * 60) {
-      return new Date(timestamp * 1000).toLocaleDateString()
-    } else {
-      if (timestamp < now - 60 * 60) {
-        const hrs = Math.floor((now - timestamp) / 60 / 60)
-        if (hrs > 24) return Math.floor(hrs / 24) + 'd ago'
-        return hrs + 'h ago'
-      }
-      if (timestamp < now - 60) {
-        return Math.floor((now - timestamp) / 60) + 'm ago'
-      }
-      if (timestamp < now) {
-        return Math.floor((now - timestamp)) + 's ago'
-      }
-    }
-
-  }
 
   useEffect(() => {
     if (localStorage.getItem('keyPair') === null) {
@@ -136,43 +110,9 @@ function Profile() {
           <p className="text-sm" style={{ whiteSpace: "pre-line" }}>{profile.about}</p>
         </div>
 
-
         {/* feed */}
-        {/* {
-    "content": "wow primal is a great client 🧡",
-    "created_at": 1702597196,
-    "id": "38f7fd5f00fd46cceb48b7ba950e807f7767cb01f3ba1d99127a1325f20f5dbe",
-    "kind": 1,
-    "pubkey": "72c3b924c01e2bc4a75f042bf53bc86670a52fac4d32e563ec166271fbba5141",
-    "sig": "bf6a8c87150ba2433f728e8afb0ef2cebe1b7e405073aca9695155cbb1f6b5beaf7c9806f13bef226ec5f4318f313c5c053d97b43f2ab005b25b2dd32b3b5fae",
-    "tags": []
-} */}
         <div className="flex flex-col w-full">
-          {posts.map((post, i) =>
-            <div className={`flex gap-2 py-4 px-2  ${i !== posts.length - 1 && "border border-gray-300 border-t-0 border-x-0"}`}>
-              <div className="w-12 h-12 rounded-full flex-shrink-0 justify-self-center overflow-hidden ">
-                <img
-                  src={profile.picture ? profile.picture : `/icon.svg`}
-                  alt="profile picture"
-                  className="w-full h-full object-cover"
-                  style={{ objectFit: 'cover', width: '100%', height: '100%' }}
-                />
-              </div>
-              <div className="flex flex-col  flex-grow">
-                <div className="flex gap-2 text-sm flex-grow justify-between ">
-                  <div className="flex gap-2">
-                    <p className="font-bold">{profile.display_name}</p>
-                    <p className="text-gray-500">{profile.name}</p>
-                  </div>
-                  <p className=" justify-self-end text-gray-500">{getDate(post.created_at)}</p>
-                </div>
-                <p style={{ whiteSpace: 'pre-wrap' }}>{post.content}</p>
-              </div>
-            </div>
-
-          )
-          }
-
+          {posts.map((post, i) => <Post post={post} profile={profile} addBorder={i !== posts.length - 1}/>)}
         </div>
       </div>
     </>

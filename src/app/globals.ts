@@ -26,3 +26,26 @@ export function hasFailed(res: any | Failed): res is Failed {
 export function isValidPk (pk: string) {
   return pk.length === 64
 }
+
+
+
+export const getDate = (timestamp: number) => {
+    //if older than 48h ago:
+    const now = Math.floor(Date.now() / 1000)
+    if (timestamp < now - 48 * 60 * 60) {
+      return new Date(timestamp * 1000).toLocaleDateString()
+    } else {
+      if (timestamp < now - 60 * 60) {
+        const hrs = Math.floor((now - timestamp) / 60 / 60)
+        if (hrs > 24) return Math.floor(hrs / 24) + 'd ago'
+        return hrs + 'h ago'
+      }
+      if (timestamp < now - 60) {
+        return Math.floor((now - timestamp) / 60) + 'm ago'
+      }
+      if (timestamp < now) {
+        return Math.floor((now - timestamp)) + 's ago'
+      }
+    }
+
+  }
