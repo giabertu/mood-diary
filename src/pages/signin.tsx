@@ -25,6 +25,7 @@ function SignIn() {
     } else {
       setKeyPair(new_keypair)
       localStorage.setItem('keyPair', JSON.stringify(new_keypair))
+
       router.push('/profile')
     }
   }

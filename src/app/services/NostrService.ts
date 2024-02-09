@@ -142,6 +142,12 @@ class NostrService {
     return relays
   }
 
+  static async getPost(id: string) {
+    let post = await pool.querySync(DEFAULT_RELAYS, { ids: [id] })
+    return post
+
+  }
+
   static async getProfileFollowers(pk: string) {
     let followers = await pool.querySync(DEFAULT_RELAYS, { kinds: [3], "#p": [pk] })
     return followers

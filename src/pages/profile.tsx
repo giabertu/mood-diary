@@ -21,7 +21,7 @@ export type UserProfile = {
   created_at: number;
 }
 
-const DEFAULT_PROFILE: UserProfile = {
+export const DEFAULT_PROFILE: UserProfile = {
   banner: '',
   website: '',
   lud06: '',
@@ -37,10 +37,12 @@ const DEFAULT_PROFILE: UserProfile = {
 
 function Profile() {
 
-  const { keyPair, setKeyPair } = useSkContext()
-  const [profile, setProfile] = useState(DEFAULT_PROFILE)
+  const { keyPair, setKeyPair, setProfile, profile } = useSkContext()
+  // const [profile, setProfile] = useState(DEFAULT_PROFILE)
   const [posts, setPosts] = useState<Event[]>([])
   const router = useRouter()
+
+  console.log({ keyPair })
 
   useEffect(() => {
     async function getProfile() {

@@ -6,7 +6,7 @@ import { nip19 } from "nostr-tools";
 
 type PostProps = {
   post: Event,
-  profile?: UserProfile,
+  profile: UserProfile,
   addBorder?: boolean,
 }
 
