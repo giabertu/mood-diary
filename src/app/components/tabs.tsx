@@ -26,7 +26,9 @@ function Tabs() {
   return (
     <div className='w-1/4 debug border border-gray-300 p-2 border-r-0'>
       <div className="sticky top-20 flex flex-col gap-8 items-center">
-        <button className="border border-gray-300 rounded-3xl p-4">
+        <button className="border border-gray-300 rounded-3xl p-4"
+        onClick={() => router.push('/home')}
+        >
           Home
         </button>
         <button className="border border-gray-300 rounded-3xl p-4">

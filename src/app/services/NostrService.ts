@@ -126,9 +126,27 @@ class NostrService {
     return events
   }
 
+
+  static async getFeed(pks: string[]) {
+    let feed = await pool.querySync(DEFAULT_RELAYS, { kinds: [1], authors: pks, limit: 40 })
+    const feedPosts = feed.filter(post => {
+      let isReply = false;
+      for (let i = 0; i < post.tags.length; i++) {
+        if (post.tags[i][0] === 'e') {
+          isReply = true
+          break;
+        }
+      }
+      return !isReply
+    })
+    return feedPosts.toSorted((a: Event, b: Event) => b.created_at - a.created_at)
+  }
+
   //returns posts (not replies to posts) in cronological order
+  //pk needs to be in hex format
   static async getProfilePosts(pk: string) {
     let posts = await pool.querySync(DEFAULT_RELAYS, { kinds: [1], authors: [pk] })
+    console.log({ posts })
     const mainPosts = posts.filter(post => {
       console.log("post", post)
       if (post.tags.length === 0) return true //no replies
@@ -154,9 +172,13 @@ class NostrService {
   }
 
   static async getProfileFollowing(pk: string) {
+    console.log("Here is the pk mf ", pk)
     let kind3 = await pool.querySync(DEFAULT_RELAYS, { kinds: [3], authors: [pk] })
+    console.log({kind3})
+    if (kind3.length == 0) return []
     let following = kind3[0].tags.filter((arrString: string[]) => isValidPk(arrString[1]) && arrString[1])
-    return following
+    return following.map((arrString: string[]) => arrString[1])
+
   }
 
   static async getProfileInfo(pk: string) {
@@ -180,3 +202,14 @@ class NostrService {
 
 
 export { NostrService }
+
+
+
+/**
+ * 
+ * Main posts have empty tags. afaik. maybe mentions adds a tag??
+ * 
+ * 
+ * 
+ * 
+ */

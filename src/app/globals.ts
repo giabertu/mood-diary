@@ -3,6 +3,7 @@ import { KeyPair } from "./services/NostrService"
 const DEFAULT_RELAYS = [
   'wss://relay.primal.net',
   'wss://relay.damus.io',
+  'wss://offchain.pub',
   'wss://relay.snort.social',
 ]
 

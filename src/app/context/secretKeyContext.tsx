@@ -6,7 +6,7 @@ import { KeyPair, NostrService } from '../services/NostrService';
 import { useRouter } from 'next/router';
 import { DEFAULT_PROFILE, UserProfile } from '@/pages/profile';
 
-const AuthContext = createContext({ keyPair: { sk: new Uint8Array(), nsec: '', pk: '', npub: '' }, profile: DEFAULT_PROFILE, setKeyPair: (keypair: KeyPair) => { }, setProfile: (profile: UserProfile) => { } });
+const AuthContext = createContext({ keyPair: { sk: new Uint8Array(), nsec: '', pk: '', npub: '' }, profile: DEFAULT_PROFILE, setKeyPair: (keypair: KeyPair) => { }, setProfile: (profile: UserProfile) => { }, following: [] as string[], setFollowing: (following: string[]) => { } });
 
 export function useSkContext() {
   return useContext(AuthContext);
@@ -20,6 +20,7 @@ type SecretKeyProviderProps = {
 export function SecretKeyProvider({ children }: SecretKeyProviderProps) {
   const [keyPair, setKeyPair] = useState({ sk: new Uint8Array(), nsec: '', pk: '', npub: '' });
   const [profile, setProfile] = useState(DEFAULT_PROFILE)
+  const [following, setFollowing] = useState<string[]>([])
   const router = useRouter()
 
   useEffect(() => {
@@ -28,9 +29,15 @@ export function SecretKeyProvider({ children }: SecretKeyProviderProps) {
       if (storedKeys) {
         const parsedKeys = JSON.parse(storedKeys)
         setKeyPair(parsedKeys)
-        const prof = await NostrService.getProfileInfo(parsedKeys.pk)
+        console.log({parsedKeys})
+        const [prof, following] = await Promise.all([
+          NostrService.getProfileInfo(parsedKeys.pk),
+          NostrService.getProfileFollowing(parsedKeys.pk)
+        ])
         const parsedProfile = JSON.parse(prof[0]?.content)
         setProfile({ ...parsedProfile, created_at: prof[0]?.created_at })
+        console.log({ following })
+        setFollowing(following)
       }
     }
     getState()
@@ -38,7 +45,7 @@ export function SecretKeyProvider({ children }: SecretKeyProviderProps) {
 
 
   return (
-    <AuthContext.Provider value={{ keyPair, profile, setKeyPair, setProfile }}>
+    <AuthContext.Provider value={{ keyPair, profile, following, setFollowing, setKeyPair, setProfile }}>
       {children}
     </AuthContext.Provider>
   );
