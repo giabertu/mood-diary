@@ -17,10 +17,15 @@ function Post({ post, profile, addBorder = true }: PostProps) {
 
   const router = useRouter()
 
+  // Event handler for clicking the username
+  const handleUsernameClick = (pubkey: string, profileName: string) => {
+    router.push(`/user/${nip19.npubEncode(pubkey)}`, `/user/${profileName}`);
+  };
+
 
   return (
-    <div className={`flex gap-2 py-4 px-2 cursor-pointer  ${addBorder && "border border-gray-300 border-t-0 border-x-0"}`} onClick={() => router.push(`/post/${post.id}`)}>
-      <div className="w-12 h-12 rounded-full flex-shrink-0 justify-self-center overflow-hidden ">
+    <div className={`flex gap-2 py-4 px-2 cursor-pointer ${addBorder && "border border-gray-300 border-t-0 border-x-0"}`} onClick={() => router.push(`/post/${post.id}`)}>
+      <div className="w-12 h-12 rounded-full flex-shrink-0 justify-self-center overflow-hidden">
         <img
           src={profile && profile.picture ? profile.picture : `/icon.svg`}
           alt="profile picture"
@@ -28,18 +33,22 @@ function Post({ post, profile, addBorder = true }: PostProps) {
           style={{ objectFit: 'cover', width: '100%', height: '100%' }}
         />
       </div>
-      <div className="flex flex-col  flex-grow">
-        <div className="flex gap-2 text-sm flex-grow justify-between ">
+      <div className="flex flex-col flex-grow">
+        <div className="flex gap-2 text-sm flex-grow justify-between">
           <div className="flex gap-2">
-            <p className="font-bold hover:underline cursor-pointer" onClick={() => router.push(`/user/${nip19.npubEncode(post.pubkey)}`, `/user/${profile && profile.name}`)}>{profile && profile.display_name}</p>
+            {/* Add the onClick event handler to the username paragraph */}
+            <p className="font-bold hover:underline cursor-pointer" onClick={(e) => {
+              e.stopPropagation()
+              handleUsernameClick(post.pubkey, profile && profile.name)
+            }}>{profile && profile.display_name}</p>
             <p className="text-gray-500">{profile && profile.name}</p>
           </div>
-          <p className=" justify-self-end text-gray-500">{getDate(post.created_at)}</p>
+          <p className="justify-self-end text-gray-500">{getDate(post.created_at)}</p>
         </div>
         <p style={{ whiteSpace: 'pre-wrap' }}>{post.content}</p>
       </div>
     </div>
-  )
+  );
 
 
 }
