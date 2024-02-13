@@ -45,7 +45,7 @@ function PostPage() {
 
 
   return (
-    <div>
+    <div className="flex justify-self-start self-start flex-col gap-2 w-full h-full debug">
       {post ? <Post post={post} profile={new_profile} /> : <h1>Loading</h1>}
     </div>
   )

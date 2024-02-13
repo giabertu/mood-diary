@@ -5,6 +5,8 @@ import { useRouter } from "next/router";
 import { nip19 } from "nostr-tools";
 import { useEffect, useState } from "react";
 import { NostrService } from "../services/NostrService";
+import { getLinkPreview } from "link-preview-js";
+import Attachment from "./attachment";
 
 type PostProps = {
   post: Event,
@@ -31,7 +33,7 @@ function Post({ post, profile, addBorder = true }: PostProps) {
     if (post.content.includes('https://')) {
       const index = post.content.indexOf('https://')
       setContent(post.content.slice(0, index))
-      const urls = post.content.slice(index).split(' ').map((url) => url.trim()).filter((url) => url !== '')
+      const urls = post.content.slice(index).split(' ').filter(url => url !== '').map((url) => url.trim().split("#")[0])
       console.log(urls)
       setUrls(urls)
     } else {
@@ -52,7 +54,7 @@ function Post({ post, profile, addBorder = true }: PostProps) {
 
 
   return (
-    <div className={`flex flex-col gap-4 py-4 px-2 cursor-pointer min-w-full ${addBorder ? "border border-gray-300 border-t-0 border-x-0" : ""}`} onClick={() => router.push(`/post/${post.id}`)}>
+    <div className={`flex debug flex-col gap-4 py-4 px-2 cursor-pointer min-w-full ${addBorder ? "border border-gray-300 border-t-0 border-x-0" : ""}`} onClick={() => router.push(`/post/${post.id}`)}>
       <div className="flex gap-2 w-full">
         <div className="w-12 h-12 rounded-full flex-shrink-0 justify-self-center overflow-hidden">
           <img
@@ -75,13 +77,7 @@ function Post({ post, profile, addBorder = true }: PostProps) {
           <p style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{content}</p>
         </div>
       </div>
-      {urls.length > 0 && urls.map((url, i) => {
-        if (url.endsWith('.mp4')) return <video key={i} src={url} className="" controls />
-        if (url.endsWith('jpg') || url.endsWith('png') || url.endsWith('jpeg')) {
-          return <img key={i} src={url} alt="post image" className="" />
-        }
-        else return <a style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all' }} href={url} target="_blank" className=" text-blue-500 underline">{url}</a>
-      })}
+      <Attachment urls={urls} />
     </div>
   );
 

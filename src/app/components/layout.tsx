@@ -15,7 +15,7 @@ function Layout({ children }: LayoutProps) {
       <Navbar />
       <div className='flex w-full h-4/5'>
         <Tabs />
-        <main className=' w-1/2 self-center justify-self-center h-full'>{children}</main>
+        <main className=' w-1/2  h-full'>{children}</main>
         <Sidebar />
       </div>
       <Footer />
