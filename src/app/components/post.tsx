@@ -5,7 +5,6 @@ import { useRouter } from "next/router";
 import { nip19 } from "nostr-tools";
 import { useEffect, useState } from "react";
 import { NostrService } from "../services/NostrService";
-import { getLinkPreview } from "link-preview-js";
 import Attachment from "./attachment";
 
 type PostProps = {
