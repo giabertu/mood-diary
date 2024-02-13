@@ -37,7 +37,9 @@ function Tabs() {
         <button className="border border-gray-300 rounded-3xl p-4">
           Record
         </button>
-        <button className="border border-gray-300 rounded-3xl p-4">
+        <button className="border border-gray-300 rounded-3xl p-4"
+        onClick={() => router.push('/profile')}
+        >
           Profile
         </button>
         <button className="border border-gray-300 rounded-3xl p-4">

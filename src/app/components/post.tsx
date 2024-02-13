@@ -16,9 +16,10 @@ type PostProps = {
 
 function Post({ post, profile, addBorder = true }: PostProps) {
 
-
   const router = useRouter()
   const [newProfile, setNewProfile] = useState<UserProfile | null>(null)
+  const [urls, setUrls] = useState<string[]>([])
+  const [content, setContent] = useState<string>("")
 
   // Event handler for clicking the username
   const handleUsernameClick = (pubkey: string, profileName: string) => {
@@ -26,6 +27,16 @@ function Post({ post, profile, addBorder = true }: PostProps) {
   };
 
   useEffect(() => {
+
+    if (post.content.includes('https://')) {
+      const index = post.content.indexOf('https://')
+      setContent(post.content.slice(0, index))
+      const urls = post.content.slice(index).split(' ').map((url) => url.trim()).filter((url) => url !== '')
+      console.log(urls)
+      setUrls(urls)
+    } else {
+      setContent(post.content)
+    }
 
     async function getProfile() {
       if (profile) {
@@ -41,27 +52,36 @@ function Post({ post, profile, addBorder = true }: PostProps) {
 
 
   return (
-    <div className={`flex gap-2 py-4 px-2 cursor-pointer min-w-full ${addBorder ? "border border-gray-300 border-t-0 border-x-0" : ""}`} onClick={() => router.push(`/post/${post.id}`)}>
-      <div className="w-12 h-12 rounded-full flex-shrink-0 justify-self-center overflow-hidden">
-        <img
-          src={newProfile && newProfile.picture ? newProfile.picture : `/icon.svg`}
-          alt="profile picture"
-          className="w-full h-full object-cover"
-        />
-      </div>
-      <div className="flex flex-col w-full">
-        <div className="flex gap-2 text-sm w-full justify-between">
-          <div className="flex gap-2">
-            <p className="font-bold hover:underline cursor-pointer" onClick={(e) => {
-              e.stopPropagation();
-              newProfile && handleUsernameClick(post.pubkey, newProfile.name);
-            }}>{profile && profile.display_name}</p>
-            <p className="text-gray-500">{newProfile && newProfile.name}</p>
+    <div className={`flex flex-col gap-4 py-4 px-2 cursor-pointer min-w-full ${addBorder ? "border border-gray-300 border-t-0 border-x-0" : ""}`} onClick={() => router.push(`/post/${post.id}`)}>
+      <div className="flex gap-2 w-full">
+        <div className="w-12 h-12 rounded-full flex-shrink-0 justify-self-center overflow-hidden">
+          <img
+            src={newProfile && newProfile.picture ? newProfile.picture : `/icon.svg`}
+            alt="profile picture"
+            className="w-full h-full object-cover"
+          />
+          d</div>
+        <div className="flex flex-col w-full">
+          <div className="flex gap-2 text-sm w-full justify-between">
+            <div className="flex gap-2">
+              <p className="font-bold hover:underline cursor-pointer" onClick={(e) => {
+                e.stopPropagation();
+                newProfile && handleUsernameClick(post.pubkey, newProfile.name);
+              }}>{profile && profile.display_name}</p>
+              <p className="text-gray-500">{newProfile && newProfile.name}</p>
+            </div>
+            <p className="justify-self-end text-gray-500">{getDate(post.created_at)}</p>
           </div>
-          <p className="justify-self-end text-gray-500">{getDate(post.created_at)}</p>
+          <p style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{content}</p>
         </div>
-        <p style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{post.content}</p>
       </div>
+      {urls.length > 0 && urls.map((url, i) => {
+        if (url.endsWith('.mp4')) return <video key={i} src={url} className="" controls />
+        if (url.endsWith('jpg') || url.endsWith('png') || url.endsWith('jpeg')) {
+          return <img key={i} src={url} alt="post image" className="" />
+        }
+        else return <a style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all' }} href={url} target="_blank" className=" text-blue-500 underline">{url}</a>
+      })}
     </div>
   );
 
