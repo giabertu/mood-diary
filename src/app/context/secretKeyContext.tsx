@@ -24,6 +24,7 @@ export function SecretKeyProvider({ children }: SecretKeyProviderProps) {
   const router = useRouter()
 
   useEffect(() => {
+    console.log("running useEffect in skConetxt")
     async function getState() {
       const storedKeys = localStorage.getItem('keyPair')
       if (storedKeys) {

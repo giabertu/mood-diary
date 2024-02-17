@@ -148,11 +148,15 @@ class NostrService {
     let posts = await pool.querySync(DEFAULT_RELAYS, { kinds: [1], authors: [pk] })
     console.log({ posts })
     const mainPosts = posts.filter(post => {
-      console.log("post", post)
+      // console.log("post", post)
       if (post.tags.length === 0) return true //no replies
       return post.tags[0][0] !== 'e' //not mentioning other events (a post is an event)
     })
+    
+    console.log({initialPostLength: posts.length, filteredPostLength: mainPosts.length})
+
     return mainPosts.toSorted((a: Event, b: Event) => b.created_at - a.created_at)
+
   }
 
   static async getProfileRelays(pk: string) {

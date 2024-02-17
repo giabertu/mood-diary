@@ -24,6 +24,7 @@ function Post({ post, profile, addBorder = true }: PostProps) {
 
   // Event handler for clicking the username
   const handleUsernameClick = (pubkey: string, profileName: string) => {
+    localStorage.setItem('userInfo', JSON.stringify({ profile: newProfile, pubKey: post.pubkey }))
     router.push(`/user/${nip19.npubEncode(pubkey)}`, `/user/${profileName}`);
   };
 
@@ -51,7 +52,6 @@ function Post({ post, profile, addBorder = true }: PostProps) {
     getProfile()
   }, [])
 
-
   return (
     <div className={`flex debug flex-col gap-4 py-4 px-2 cursor-pointer min-w-full ${addBorder ? "border border-gray-300 border-t-0 border-x-0" : ""}`} onClick={() => router.push(`/post/${post.id}`)}>
       <div className="flex gap-2 w-full">
@@ -64,11 +64,11 @@ function Post({ post, profile, addBorder = true }: PostProps) {
           d</div>
         <div className="flex flex-col w-full">
           <div className="flex gap-2 text-sm w-full justify-between">
-            <div className="flex gap-2">
-              <p className="font-bold hover:underline cursor-pointer" onClick={(e) => {
-                e.stopPropagation();
-                newProfile && handleUsernameClick(post.pubkey, newProfile.name);
-              }}>{profile && profile.display_name}</p>
+            <div className="flex gap-2 hover:underline cursor-pointer" onClick={(e) => {
+              e.stopPropagation();
+              newProfile && handleUsernameClick(post.pubkey, newProfile.name);
+            }}>
+              <p className="font-bold">{newProfile && newProfile.display_name}</p>
               <p className="text-gray-500">{newProfile && newProfile.name}</p>
             </div>
             <p className="justify-self-end text-gray-500">{getDate(post.created_at)}</p>

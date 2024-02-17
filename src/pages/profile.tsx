@@ -116,6 +116,3 @@ function Profile() {
 }
 
 export default Profile
-
-
-// avatar-${Math.floor(Math.random()*2 + 1)}.webp

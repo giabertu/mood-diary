@@ -4,6 +4,7 @@ import { nip19 } from "nostr-tools";
 import { useEffect, useState } from "react";
 import { Event } from 'nostr-tools'
 import Post from "@/app/components/post";
+import { get } from "http";
 
 
 
@@ -11,18 +12,26 @@ import Post from "@/app/components/post";
 
 function Home() {
 
-  const { keyPair, following, setKeyPair } = useSkContext()
+  const { keyPair, following, setKeyPair, profile, setFollowing} = useSkContext()
   const [feed, setFeed] = useState<Event[]>([])
 
 
   useEffect(() => {
-    async function getFeed() {
+    console.log("running useEffect in home")
+    async function getFeed(getFollowing: boolean = false) {
+      if (getFollowing) {
+        const following = await NostrService.getProfileFollowing(keyPair.pk)
+        setFollowing(following)
+      }
       const posts = await NostrService.getFeed(following);
       console.log({ posts })
       setFeed(posts)
     }
+    console.log({ following, keyPair, profile})
     if (following.length > 0) {
       getFeed()
+    } else if (following.length === 0 && profile.name){
+      getFeed(true)
     }
   }, [following])
 
