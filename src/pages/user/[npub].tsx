@@ -26,7 +26,7 @@ function UserPage() {
       if (stored) {
         const { profile, pubKey } = JSON.parse(stored)
         console.log({ profile, pubKey })
-        const new_posts = await NostrService.getProfilePosts(pubKey)
+        const new_posts = await NostrService.getFeed([pubKey])
         console.log({ new_posts })
         setProfile(profile)
         setPosts(new_posts)

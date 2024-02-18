@@ -49,10 +49,13 @@ function Post({ post, profile, addBorder = true }: PostProps) {
     }
 
     async function getProfile() {
-      if (profile) {
-        setNewProfile(profile)
-      } else {
-        if (isRepost) {
+      if (isRepost) {
+        if (profile){
+          const ogProf = await NostrService.getProfileInfo(ogPost.pubkey) // get the original profile of the reposted post
+          const parsedOgProf = JSON.parse(ogProf[0]?.content)
+          setNewProfile({ ...parsedOgProf, created_at: ogProf[0]?.created_at })
+          setReposterProfile(profile) 
+        } else {
           const [ogProf, repProf] = await Promise.all([
             NostrService.getProfileInfo(ogPost.pubkey),
             NostrService.getProfileInfo(post.pubkey)
@@ -61,12 +64,13 @@ function Post({ post, profile, addBorder = true }: PostProps) {
           const parsedRepProf = JSON.parse(repProf[0]?.content)
           setNewProfile({ ...parsedOgProf, created_at: ogProf[0]?.created_at })
           setReposterProfile({ ...parsedRepProf, created_at: repProf[0]?.created_at })
-        } else {
-          const prof = await NostrService.getProfileInfo(ogPost.pubkey)
-          const parsedProfile = JSON.parse(prof[0]?.content)
-          setNewProfile({ ...parsedProfile, created_at: prof[0]?.created_at })
         }
+      } else {
+        const prof = await NostrService.getProfileInfo(ogPost.pubkey)
+        const parsedProfile = JSON.parse(prof[0]?.content)
+        setNewProfile({ ...parsedProfile, created_at: prof[0]?.created_at })
       }
+
     }
     getProfile()
   }, [])
@@ -78,12 +82,12 @@ function Post({ post, profile, addBorder = true }: PostProps) {
       {isRepost && reposterProfile && <p className="text-gray-500 flex gap-2 items-center"
         onClick={(e) => {
           e.stopPropagation();
-          if (reposterProfile){
+          if (reposterProfile) {
             localStorage.setItem('userInfo', JSON.stringify({ profile: reposterProfile, pubKey: post.pubkey }))
-            router.push(`/user/${nip19.npubEncode(post.pubkey)}`, `/user/${reposterProfile.name}`); 
-          } 
+            router.push(`/user/${nip19.npubEncode(post.pubkey)}`, `/user/${reposterProfile.name}`);
+          }
         }}><ArrowPathRoundedSquareIcon className="w-6" /> <span>by {reposterProfile?.display_name}</span></p>}
-      <div className="flex gap-2 w-full debug">
+      <div className="flex gap-2 w-full">
         <div className="w-12 h-12 rounded-full flex-shrink-0 justify-self-center overflow-hidden">
           <img
             src={newProfile && newProfile.picture ? newProfile.picture : `/icon.svg`}

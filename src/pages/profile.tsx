@@ -47,7 +47,7 @@ function Profile() {
   useEffect(() => {
     async function getProfile() {
       console.log("pub key is", keyPair.pk)
-      const new_posts = await NostrService.getProfilePosts(keyPair.pk)
+      const new_posts = await NostrService.getFeed([keyPair.pk])
       console.log({ new_posts })
       setPosts(new_posts)
     }
