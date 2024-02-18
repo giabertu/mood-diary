@@ -4,7 +4,6 @@ const DEFAULT_RELAYS = [
   'wss://relay.primal.net',
   'wss://relay.current.fyi',
   'wss://nos.lol',
-  'wss://nostr-pub.wellorder.net',
   'wss://nostr.orangepill.dev',
   'wss://nostr.wine',
   'wss://nostr.fmt.wiz.biz',

@@ -34,7 +34,7 @@ function Post({ post, profile, addBorder = true }: PostProps) {
 
   // Event handler for clicking the username
   const handleUsernameClick = (pubkey: string, profileName: string) => {
-    localStorage.setItem('userInfo', JSON.stringify({ profile: newProfile, pubKey: post.pubkey }))
+    localStorage.setItem('userInfo', JSON.stringify({ profile: newProfile, pubKey: ogPost.pubkey }))
     router.push(`/user/${nip19.npubEncode(pubkey)}`, `/user/${profileName}`);
   };
 
@@ -49,6 +49,10 @@ function Post({ post, profile, addBorder = true }: PostProps) {
     }
 
     async function getProfile() {
+      console.log("running getProfile", isRepost, profile)
+      if (isRepost !== true) {
+        console.log("post that is not a repost: ", post)
+      }
       if (isRepost) {
         if (profile){
           const ogProf = await NostrService.getProfileInfo(ogPost.pubkey) // get the original profile of the reposted post
@@ -76,6 +80,7 @@ function Post({ post, profile, addBorder = true }: PostProps) {
   }, [])
 
 
+  console.log({isRepost, reposterProfile})
 
   return (
     <div className={`flex flex-col gap-2 py-4 px-2 cursor-pointer min-w-full ${addBorder ? "border border-gray-300 border-t-0 border-x-0" : ""}`} onClick={() => router.push(`/post/${ogPost.id}`)}>
