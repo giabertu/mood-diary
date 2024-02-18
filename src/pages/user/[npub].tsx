@@ -57,7 +57,9 @@ function UserPage() {
       <div className="border border-gray-300 h-full p-2  flex flex-col gap-2">
         <div className="flex flex-col justify-between gap-1">
           <div className="relative flex flex-col ">
-            <img src={profile.banner ? profile.banner : `/banner.jpg`} alt="banner" className="w-full" />
+            <div className="w-full max-h-[20rem] overflow-hidden">
+              <img src={profile.banner ? profile.banner : `/banner.jpg`} alt="banner" className="w-full object-contain" />
+            </div>
             <div className="w-36 h-36 rounded-full justify-self-center absolute bottom-2 overflow-hidden flex items-center justify-center">
               <img
                 src={profile.picture ? profile.picture : `/icon.svg`}

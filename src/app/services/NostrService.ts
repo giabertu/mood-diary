@@ -126,10 +126,12 @@ class NostrService {
     return events
   }
 
-
+// kind 1 text note, kind 6 is repost (content is stringified event object)
   static async getFeed(pks: string[]) {
-    let feed = await pool.querySync(DEFAULT_RELAYS, { kinds: [1], authors: pks, limit: 40 })
+    let feed = await pool.querySync(DEFAULT_RELAYS, { kinds: [1, 6], authors: pks, limit: 40 })
+    console.log({ feed })
     const feedPosts = feed.filter(post => {
+      if (post.kind === 6) return true //repost
       let isReply = false;
       for (let i = 0; i < post.tags.length; i++) {
         if (post.tags[i][0] === 'e') {
@@ -145,12 +147,12 @@ class NostrService {
   //returns posts (not replies to posts) in cronological order
   //pk needs to be in hex format
   static async getProfilePosts(pk: string) {
-    let posts = await pool.querySync(DEFAULT_RELAYS, { kinds: [1], authors: [pk] })
+    let posts = await pool.querySync(DEFAULT_RELAYS, { kinds: [1, 6], authors: [pk] })
     console.log({ posts })
     const mainPosts = posts.filter(post => {
       // console.log("post", post)
       if (post.tags.length === 0) return true //no replies
-      return post.tags[0][0] !== 'e' //not mentioning other events (a post is an event)
+      return post.tags[0][0] !== 'e' || post.kind == 6 //not mentioning other events (a post is an event) or is a repost
     })
     
     console.log({initialPostLength: posts.length, filteredPostLength: mainPosts.length})
