@@ -54,11 +54,11 @@ function Post({ post, profile, addBorder = true }: PostProps) {
         console.log("post that is not a repost: ", post)
       }
       if (isRepost) {
-        if (profile){
+        if (profile) {
           const ogProf = await NostrService.getProfileInfo(ogPost.pubkey) // get the original profile of the reposted post
           const parsedOgProf = JSON.parse(ogProf[0]?.content)
           setNewProfile({ ...parsedOgProf, created_at: ogProf[0]?.created_at })
-          setReposterProfile(profile) 
+          setReposterProfile(profile)
         } else {
           const [ogProf, repProf] = await Promise.all([
             NostrService.getProfileInfo(ogPost.pubkey),
@@ -80,7 +80,7 @@ function Post({ post, profile, addBorder = true }: PostProps) {
   }, [])
 
 
-  console.log({isRepost, reposterProfile})
+  console.log({ isRepost, reposterProfile })
 
   return (
     <div className={`flex flex-col gap-2 py-4 px-2 cursor-pointer min-w-full ${addBorder ? "border border-gray-300 border-t-0 border-x-0" : ""}`} onClick={() => router.push(`/post/${ogPost.id}`)}>
@@ -113,9 +113,9 @@ function Post({ post, profile, addBorder = true }: PostProps) {
             <p className="justify-self-end text-gray-500">{getDate(ogPost.created_at)}</p>
           </div>
           <p style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{content}</p>
+          <Attachment urls={urls} />
         </div>
       </div>
-      <Attachment urls={urls} />
     </div>
   );
 
