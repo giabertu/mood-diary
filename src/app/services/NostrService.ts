@@ -233,8 +233,6 @@ class NostrService {
     const finalisedEvent = finalizeEvent(unlikePost, newData)
     await Promise.any(pool.publish(DEFAULT_RELAYS, finalisedEvent))
     return true
-
-
   }
 
   static async getProfileFollowers(pk: string) {

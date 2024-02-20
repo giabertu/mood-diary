@@ -6,10 +6,7 @@ import { nip19 } from "nostr-tools";
 import { useEffect, useState } from "react";
 import { NostrService } from "../services/NostrService";
 import Attachment from "./attachment";
-import { PostponedPathnameNormalizer } from "next/dist/server/future/normalizers/request/postponed";
 import { ArrowPathRoundedSquareIcon } from "@heroicons/react/24/outline";
-import { constants } from "crypto";
-import { HandThumbUpIcon } from "@heroicons/react/24/outline";
 import { ChatBubbleBottomCenterIcon } from "@heroicons/react/24/outline";
 import { HeartIcon as HeartOutline } from "@heroicons/react/24/outline";
 import { HeartIcon as HeartSolid } from "@heroicons/react/24/solid";
@@ -19,11 +16,13 @@ type PostProps = {
   post: Event,
   profile: UserProfile | null,
   addBorder?: boolean,
+  kind?: "post" | "comment" | "reply"
+  OP?: UserProfile | null
 }
 
 
 
-function Post({ post, profile, addBorder = true }: PostProps) {
+function Post({ post, profile, addBorder = true, kind = "post", OP }: PostProps) {
 
   const router = useRouter()
   const [newProfile, setNewProfile] = useState<UserProfile | null>(null)
@@ -35,7 +34,8 @@ function Post({ post, profile, addBorder = true }: PostProps) {
   const [postReposts, setPostReposts] = useState<Event[]>([])
   const [liked, setLiked] = useState<boolean>(false)
   const [reposted, setReposted] = useState<boolean>(false)
-  const [commented, setCommented] = useState<boolean>(false) 
+  const [commented, setCommented] = useState<boolean>(false)
+  const [showReplies, setShowReplies] = useState<boolean>(kind == 'post') 
 
 
   const [hidePost, setHidePost] = useState<boolean>(false) //if a repost is untoggled in profile or user tabs (not post or home feed)
@@ -43,8 +43,6 @@ function Post({ post, profile, addBorder = true }: PostProps) {
 
   const isRepost = post.kind === 6;
   const ogPost = isRepost ? JSON.parse(post.content) : post;
-  const showReplies = router.asPath.includes('post')
-
   const { keyPair } = useSkContext()
 
 
@@ -117,6 +115,11 @@ function Post({ post, profile, addBorder = true }: PostProps) {
   }, [post])
 
 
+  if (postReplies.length > 0 && kind === 'post') {
+    console.log({ postId: post.id, postReplies })
+  }
+
+
   const toggleLikePost = async (eId: string, ePk: string) => {
     if (liked) {
       // unlike post
@@ -169,49 +172,75 @@ function Post({ post, profile, addBorder = true }: PostProps) {
 
 
   return (
-    <div className={`flex flex-col gap-2 py-4 px-2 min-w-full ${addBorder ? "border border-gray-300 border-t-0 border-x-0" : ""}`}>
-      {isRepost && reposterProfile && <p className="text-gray-500 flex gap-2 items-center"
-        onClick={(e) => {
-          e.stopPropagation();
-          if (reposterProfile) {
-            localStorage.setItem('userInfo', JSON.stringify({ profile: reposterProfile, pubKey: post.pubkey }))
-            router.push(`/user/${nip19.npubEncode(post.pubkey)}`, `/user/${reposterProfile.name}`);
-          }
-        }}><ArrowPathRoundedSquareIcon className="w-6" /> <span>by {reposterProfile?.display_name}</span></p>}
-      <div className="flex gap-2 w-full">
-        <div className="w-12 h-12 rounded-full flex-shrink-0 justify-self-center overflow-hidden">
-          <img
-            src={newProfile && newProfile.picture ? newProfile.picture : `/icon.svg`}
-            alt="profile picture"
-            className="w-full h-full object-cover"
-          />
-        </div>
-
-        <div className="flex flex-col w-full">
-          <div className="flex gap-2 text-sm w-full justify-between">
-            <div className="flex gap-2 hover:underline cursor-pointer" onClick={(e) => {
-              e.stopPropagation();
-              newProfile && handleUsernameClick(ogPost.pubkey, newProfile.name);
-            }}>
-              <p className="font-bold">{newProfile && newProfile.display_name}</p>
-              <p className="text-gray-500">{newProfile && newProfile.name}</p>
-            </div>
-            <p className="justify-self-end text-gray-500">{getDate(ogPost.created_at)}</p>
+    <>
+      <div className={`flex flex-col gap-2 py-4 px-2 ${kind === 'reply' && 'px-6 py-2'} min-w-full ${addBorder ? "border border-gray-300 border-t-0 border-x-0" : ""}`}>
+        {isRepost && reposterProfile && <p className="text-gray-500 flex gap-2 items-center"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (reposterProfile) {
+              localStorage.setItem('userInfo', JSON.stringify({ profile: reposterProfile, pubKey: post.pubkey }))
+              router.push(`/user/${nip19.npubEncode(post.pubkey)}`, `/user/${reposterProfile.name}`);
+            }
+          }}><ArrowPathRoundedSquareIcon className="w-6" /> <span>by {reposterProfile?.display_name}</span></p>}
+        <div className="flex gap-2 w-full">
+          <div className={`${kind === 'reply' ? 'w-10 h-10' : 'w-12 h-12'} rounded-full flex-shrink-0 justify-self-center overflow-hidden`}>
+            <img
+              src={newProfile && newProfile.picture ? newProfile.picture : `/icon.svg`}
+              alt="profile picture"
+              className={`w-full h-full object-cover`}
+            />
           </div>
-          <p style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all' }} onClick={() => router.push(`/post/${ogPost.id}`)}>{content}</p>
-          <Attachment urls={urls} />
-          <div className="flex gap-8 p-2 text-gray-500 w-full">
-            <p className="flex gap-2 items-center">{postReactions.length}
-              <button onClick={() => toggleLikePost(post.id, post.pubkey)}>{liked ? <HeartSolid className="w-4 text-purple-500" /> : <HeartOutline className="w-4" />}</button>
-            </p>
-            <p className="flex gap-2 items-center">{postReposts.length}
-              <button onClick={() => toggleRepost(post)} >{reposted ? <ArrowPathRoundedSquareIcon className="w-4 text-purple-500" /> : <ArrowPathRoundedSquareIcon className="w-4" />}</button>
-            </p>
-            <p className="flex gap-2 items-center">{postReplies.length} {commented ? <ChatBubbleBottomCenterIcon className="w-4 text-purple-500" /> : <ChatBubbleBottomCenterIcon className="w-4" />} </p>
+
+          <div className="flex flex-col w-full">
+            <div className="flex gap-2 text-sm w-full justify-between">
+              <div className="flex gap-2 hover:underline cursor-pointer" onClick={(e) => {
+                e.stopPropagation();
+                newProfile && handleUsernameClick(ogPost.pubkey, newProfile.name);
+              }}>
+                <p className="font-bold">{newProfile && newProfile.display_name}</p>
+                <p className="text-gray-500">{newProfile && newProfile.name}</p>
+              </div>
+              <p className="justify-self-end text-gray-500">{getDate(ogPost.created_at)}</p>
+            </div>
+            {kind !== "post" && <div className="flex gap-2 text-sm text-gray-500 w-full">replying to<span className="text-purple-500">{OP?.display_name}</span></div>}
+            <p style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all' }} onClick={() => router.push(`/post/${ogPost.id}`)}>{content}</p>
+            <Attachment urls={urls} />
+            <div className="flex gap-8 p-2 text-gray-500 w-full">
+              <p className="flex gap-2 items-center">{postReactions.length}
+                <button onClick={() => toggleLikePost(post.id, post.pubkey)}>{liked ? <HeartSolid className="w-4 text-purple-500" /> : <HeartOutline className="w-4" />}</button>
+              </p>
+              <p className="flex gap-2 items-center">{postReposts.length}
+                <button onClick={() => toggleRepost(post)} >{reposted ? <ArrowPathRoundedSquareIcon className="w-4 text-purple-500" /> : <ArrowPathRoundedSquareIcon className="w-4" />}</button>
+              </p>
+              <p className="flex gap-2 items-center">{postReplies.length} {commented ? <ChatBubbleBottomCenterIcon className="w-4 text-purple-500" /> : <ChatBubbleBottomCenterIcon className="w-4" />} {kind !== 'post' && postReplies.length > 0 && <button onClick={() => setShowReplies(prev => !prev)} className="text-xs text-gray-500">{showReplies ? "hide" : "show"} replies</button>}</p>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+      {(showReplies && router.asPath.includes("post") && postReplies.length > 0) && <div className="flex flex-col gap-2 p-2">
+          {postReplies.filter(reply => {
+            // to implement...
+            // handle differently depending on post, comment, reply?
+            if (kind === 'comment' || kind === 'reply') return true
+            let count = 0; 
+            // if (kind === "post")  just show comments
+            reply.tags.forEach(tag => {
+              if (tag[0] == 'e'){
+                count++
+              } 
+            })
+            return count === 1 
+            // if (kind === comment) show ALL replies
+          }).map((reply, i) => <Post
+            key={reply.id}
+            kind={kind === "post" ? "comment" : "reply"}
+            OP={newProfile} 
+            post={reply}
+            profile={null}
+            addBorder={i !== postReplies.length - 1} />)}
+        </div>
+      }
+    </>
   );
 
 }
