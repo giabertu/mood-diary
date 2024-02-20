@@ -1,6 +1,6 @@
 import { DEFAULT_RELAYS, Failed, isValidPk } from '../globals'
-import { getUnit8ArrayFromHex } from './utils'
-import { generateSecretKey, getPublicKey, Relay, nip19 } from 'nostr-tools'
+import { getHexFromUnit8Array, getUnit8ArrayFromHex } from './utils'
+import { generateSecretKey, getPublicKey, Relay, nip19, finalizeEvent, EventTemplate, verifyEvent } from 'nostr-tools'
 import { pool } from './utils'
 import { Event } from 'nostr-tools'
 
@@ -9,9 +9,9 @@ let pk = getPublicKey(sk) // `pk` is a hex string
 
 export type KeyPair = {
   sk: Uint8Array,
-  nsec: `nsec1${string}`,
+  nsec: string,
   pk: string,
-  npub: `npub1${string}`
+  npub: string
 }
 
 type PubKeyPair = {
@@ -126,7 +126,7 @@ class NostrService {
     return events
   }
 
-// kind 1 text note, kind 6 is repost (content is stringified event object)
+  // kind 1 text note, kind 6 is repost (content is stringified event object)
   static async getFeed(pks: string[]) {
     let feed = await pool.querySync(DEFAULT_RELAYS, { kinds: [1, 6], authors: pks, limit: 40 })
     console.log({ feed })
@@ -154,8 +154,8 @@ class NostrService {
       if (post.tags.length === 0) return true //no replies
       return post.tags[0][0] !== 'e' || post.kind == 6 //not mentioning other events (a post is an event) or is a repost
     })
-    
-    console.log({initialPostLength: posts.length, filteredPostLength: mainPosts.length})
+
+    console.log({ initialPostLength: posts.length, filteredPostLength: mainPosts.length })
 
     return mainPosts.toSorted((a: Event, b: Event) => b.created_at - a.created_at)
 
@@ -169,6 +169,71 @@ class NostrService {
   static async getPost(id: string) {
     let post = await pool.querySync(DEFAULT_RELAYS, { ids: [id] })
     return post
+  }
+
+  static async getPostEngagement(id: string) {
+    let res = await pool.querySync(DEFAULT_RELAYS, { kinds: [1, 6, 7], "#e": [id] }) //replies, reposts, reactions
+    const replies: Event[] = []
+    const reactions: Event[] = []
+    const reposts: Event[] = []
+    const postEng = { replies, reactions, reposts }
+    for (let i = 0; i < res.length; i++) {
+      if (res[i].kind === 1) {
+        postEng.replies.push(res[i])
+      } else if (res[i].kind === 7) {
+        postEng.reactions.push(res[i])
+      } else if (res[i].kind === 6) {
+        reposts.push(res[i])
+      }
+    }
+    return postEng
+  }
+
+  //nip-25
+  static async likePost(eId: string, ePk: string, keyPair: KeyPair) {
+    const { type, data } = nip19.decode(keyPair.nsec)
+    const newData = data as Uint8Array
+    const likeEvent = finalizeEvent({
+      kind: 7,
+      content: '+',
+      tags: [['e', eId], ['p', ePk]],
+      created_at: Math.floor(Date.now() / 1000)
+    }, newData)
+    const isGood = verifyEvent(likeEvent)
+    const e = await Promise.any(pool.publish(DEFAULT_RELAYS, likeEvent))
+    return e
+  }
+
+  //nip-18
+  static async repostPost(ogE: Event, keyPair: KeyPair) {
+    const { data } = nip19.decode(keyPair.nsec)
+    const newData = data as Uint8Array
+    const repostEvent = finalizeEvent({
+      kind: 6,
+      content: JSON.stringify(ogE),
+      tags: [['e', ogE.id, 'wss://relay.primal.net'], ['p', ogE.pubkey]],
+      created_at: Math.floor(Date.now() / 1000)
+    }, newData)
+    const isGood = verifyEvent(repostEvent)
+    const e = await Promise.any(pool.publish(DEFAULT_RELAYS, repostEvent))
+    return e
+  }
+
+  //nip-09 (eId is the of the like event)
+  static async deleteEvent(eId: string, keyPair: KeyPair, content: string) {
+    const { type, data } = nip19.decode(keyPair.nsec)
+    const newData = data as Uint8Array
+    const unlikePost = {
+      kind: 5,
+      content, //"unlike post", "unrepost event", "delete post" etc.
+      tags: [['e', eId]],
+      created_at: Math.floor(Date.now() / 1000)
+    }
+
+    const finalisedEvent = finalizeEvent(unlikePost, newData)
+    await Promise.any(pool.publish(DEFAULT_RELAYS, finalisedEvent))
+    return true
+
 
   }
 
@@ -180,7 +245,7 @@ class NostrService {
   static async getProfileFollowing(pk: string) {
     console.log("Here is the pk mf ", pk)
     let kind3 = await pool.querySync(DEFAULT_RELAYS, { kinds: [3], authors: [pk] })
-    console.log({kind3})
+    console.log({ kind3 })
     if (kind3.length == 0) return []
     let following = kind3[0].tags.filter((arrString: string[]) => isValidPk(arrString[1]) && arrString[1])
     return following.map((arrString: string[]) => arrString[1])
@@ -208,14 +273,3 @@ class NostrService {
 
 
 export { NostrService }
-
-
-
-/**
- * 
- * Main posts have empty tags. afaik. maybe mentions adds a tag??
- * 
- * 
- * 
- * 
- */

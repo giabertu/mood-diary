@@ -16,8 +16,12 @@ function PostPage() {
 
   const [post, setPost] = useState<Event | null>(null)
   const [new_profile, setNewProfile] = useState<UserProfile>(DEFAULT_PROFILE)
-
   const { keyPair, profile, setProfile, setKeyPair } = useSkContext()
+
+  const isRepost = post ? post.kind === 6 : null;
+  const ogPost = post ? isRepost ? JSON.parse(post.content) : post : null;
+  const showReplies = router.asPath.includes('post')
+
 
 
 
@@ -29,7 +33,7 @@ function PostPage() {
       if (id && typeof id === 'string') {
         const post = await NostrService.getPost(id)
         if (post[0].pubkey === keyPair.pk) {
-          console.log({profile})
+          console.log({ profile })
           setNewProfile(profile)
         } else {
           const new_prof = await NostrService.getProfileInfo(post[0].pubkey)
@@ -41,6 +45,8 @@ function PostPage() {
     }
     getPost()
   }, [router.query.id, profile])
+
+
 
 
 

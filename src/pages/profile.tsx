@@ -63,6 +63,7 @@ function Profile() {
     }
   }, [])
 
+
   const copyToClipboard = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
@@ -107,7 +108,7 @@ function Profile() {
 
         {/* feed */}
         <div className="flex flex-col w-full">
-          {posts.map((post, i) => <Post key={post.id} post={post} profile={profile} addBorder={i !== posts.length - 1} />)}
+          {posts.map((post, i) => <Post key={post.id} post={post} profile={profile}  addBorder={i !== posts.length - 1} />)}
         </div>
       </div>
     </>
