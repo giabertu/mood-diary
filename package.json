@@ -13,7 +13,9 @@
     "next": "14.1.0",
     "nostr-tools": "^2.1.5",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "wavesurfer-react": "^3.0.2",
+    "wavesurfer.js": "^7.7.3"
   },
   "devDependencies": {
     "@types/node": "^20",

@@ -221,16 +221,16 @@ function Post({ post, profile, addBorder = true, kind = "post", OP }: PostProps)
           {postReplies.filter(reply => {
             // to implement...
             // handle differently depending on post, comment, reply?
+            // if (kind === "post")  just show comments
+            // if (kind === comment or reply) show ALL replies
             if (kind === 'comment' || kind === 'reply') return true
             let count = 0; 
-            // if (kind === "post")  just show comments
             reply.tags.forEach(tag => {
               if (tag[0] == 'e'){
                 count++
               } 
             })
             return count === 1 
-            // if (kind === comment) show ALL replies
           }).map((reply, i) => <Post
             key={reply.id}
             kind={kind === "post" ? "comment" : "reply"}

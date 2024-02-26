@@ -40,7 +40,9 @@ function Tabs() {
         <button className="border border-gray-300 rounded-3xl p-4 flex items-center gap-4">
           <ChartBarIcon className="w-6" /> History
         </button>
-        <button className="border border-gray-300 rounded-3xl p-4 flex items-center gap-4" >
+        <button className="border border-gray-300 rounded-3xl p-4 flex items-center gap-4"
+         onClick={() => router.push('/record/')}
+         >
           <MicrophoneIcon className="w-6" /> Record
         </button>
         <button className="border border-gray-300 rounded-3xl p-4 flex items-center gap-4"
