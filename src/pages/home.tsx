@@ -4,7 +4,6 @@ import { nip19 } from "nostr-tools";
 import { useEffect, useState } from "react";
 import { Event } from 'nostr-tools'
 import Post from "@/app/components/post";
-import { get } from "http";
 
 
 

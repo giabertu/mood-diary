@@ -4,60 +4,6 @@ class DiaryService {
 
   constructor() { }
 
-  // static async postDiaryEntry(audio: Blob, npub: string): Promise<{status: string, message: string, filePath?: string}> {
-  //   console.log('audio ', audio);
-  //   console.log('npub ', npub);
-
-  //   const file = new File([audio], "diary-entry.wav", {type: "audio/wav"})
-  //   const formData = new FormData();
-  //   // formData.append('name', "diary-entry")
-  //   // formData.append('audio', file);
-  //   // formData.append('npub', npub);
-
-  //   const response = await fetch('http://localhost:3001/diary-entry', {
-  //     method: 'POST',
-  //     body: formData
-  //   });
-  //   // const response = await fetch('http://localhost:3001/diary-entry', {
-  //   //   method: 'POST',
-  //   //   body: JSON.stringify({file, npub}),
-  //   // });
-
-  //   return response.json();
-  // }
-
-  //   static async postDiaryEntry(audio: Blob, npub: string): Promise<{status: string, message: string, filePath?: string}> {
-  //     console.log('audio ', audio);
-  //     console.log('npub ', npub);
-
-  //     // Convert Blob to base64
-  //     const convertBlobToBase64 = (blob: Blob) => new Promise((resolve, reject) => {
-  //         const reader = new FileReader();
-  //         reader.onerror = reject;
-  //         reader.onload = () => {
-  //             resolve(reader.result);
-  //         };
-  //         reader.readAsDataURL(blob); // Converts Blob to base64 and calls onload
-  //     });
-
-  //     const base64Audio = await convertBlobToBase64(audio) as string
-
-  //     // Assuming the server expects the audio data as a base64 string under the key "audioBase64"
-  //     const response = await fetch('http://localhost:3001/diary-entry', {
-  //         method: 'POST',
-  //         headers: {
-  //             'Content-Type': 'application/json',
-  //         },
-  //         body: JSON.stringify({
-  //             audioBase64: base64Audio.split(',')[1], // Remove the data URL part (e.g., "data:audio/wav;base64,")
-  //             npub: npub,
-  //         }),
-  //     });
-
-  //     return response.json();
-  // }
-
-
   static async postDiaryEntry(audio: Blob, npub: string): Promise<{ status: string, message: string, filePath?: string }> {
 
     const file = new File([audio], "diary-entry.webm", { type: "audio/webm;codecs=pcm" })

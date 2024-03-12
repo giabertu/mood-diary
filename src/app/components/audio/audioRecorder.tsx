@@ -19,7 +19,6 @@ const AudioRecorder = () => {
   const startRecording = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     const recorder = new MediaRecorder(stream, { mimeType: "audio/webm;codecs=pcm" });
-
     setMediaRecorder(recorder);
     recorder.start();
     console.log('recording started');

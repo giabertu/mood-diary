@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { NostrService } from '@/app/services/NostrService'
 import "../app/styles/globals.css";
-import { hasFailed } from '@/app/globals';
+import { hasFailed, supabase } from '@/app/globals';
 import { useSkContext } from '@/app/context/secretKeyContext';
 import { useRouter } from 'next/router';
 import { DocumentDuplicateIcon } from '@heroicons/react/24/outline'
@@ -16,7 +16,7 @@ function SignIn() {
 
   const router = useRouter()
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const new_keypair = NostrService.getKeyPair(sk.trim())
     console.log(new_keypair)
@@ -24,9 +24,24 @@ function SignIn() {
       setErr(new_keypair.message)
     } else {
       setKeyPair(new_keypair)
+      //check if already in supabase
+      const { data, error } = await supabase.from('User').select('npub').eq('npub', new_keypair.npub)
+      if (data && data.length == 0 && !error) {
+        const { error: userCreationError } = await supabase.from('User').insert({ npub: keyPair.npub })
+        if (userCreationError) {
+          console.error(userCreationError)
+          setErr('Supabase user creation error')
+          return
+        }
+      }
+      if (error) {
+        console.error(error)
+        setErr('Supabase error')
+        return
+      }
       localStorage.setItem('keyPair', JSON.stringify(new_keypair))
-
       router.push('/profile')
+
     }
   }
 

@@ -4,6 +4,7 @@ import { NostrService } from "../services/NostrService";
 import { DocumentDuplicateIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/router";
 import { finalizeEvent, verifyEvent } from "nostr-tools";
+import { supabase } from "../globals";
 
 function CreateAccount() {
 
@@ -46,6 +47,12 @@ function CreateAccount() {
     const res = await NostrService.publishEvent(event)
     console.log({ res })
     if (res) {
+      const { error } = await supabase.from('User').insert({ npub: keyPair.npub })
+      if (error) {
+        console.error(error)
+        setErr('Supabase error')
+        return
+      }
       localStorage.setItem('keyPair', JSON.stringify(keyPair))
       router.push('/profile')
     } else {

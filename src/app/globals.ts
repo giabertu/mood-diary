@@ -3,13 +3,9 @@ import { createClient } from '@supabase/supabase-js'
 
 const DEFAULT_RELAYS = [
   'wss://relay.primal.net',
-  'wss://relay.current.fyi',
   'wss://nos.lol',
-  'wss://nostr.orangepill.dev',
-  'wss://nostr.wine',
   'wss://nostr.fmt.wiz.biz',
   'wss://relay.damus.io',
-  'wss://offchain.pub',
   'wss://relay.snort.social',
 ]
 
