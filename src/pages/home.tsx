@@ -17,19 +17,22 @@ function Home() {
 
   useEffect(() => {
     console.log("running useEffect in home")
+
     async function getFeed(getFollowing: boolean = false) {
       if (getFollowing) {
         const following = await NostrService.getProfileFollowing(keyPair.pk)
         setFollowing(following)
       }
-      const posts = await NostrService.getFeed(following);
-      console.log({ posts })
-      setFeed(posts)
+      if (following){
+        const posts = await NostrService.getFeed(following);
+        console.log({ posts })
+        setFeed(posts)
+      }
     }
     console.log({ following, keyPair, profile})
-    if (following.length > 0) {
+    if (following && following.length > 0) { //if we have a following list, then we can get the feed
       getFeed()
-    } else if (following.length === 0 && profile.name){
+    } else if (!following && profile.name){ //if following is null, but profile is not, then we need to get the following list
       getFeed(true)
     }
   }, [following])

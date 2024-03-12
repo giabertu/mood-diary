@@ -9,7 +9,7 @@ import CreateAccount from '@/app/components/createAccount';
 
 function SignIn() {
 
-  const { keyPair, setKeyPair } = useSkContext()
+  const { keyPair, setKeyPair, setProfile } = useSkContext()
   const [sk, setSecret] = useState('')
   const [err, setErr] = useState('')
   const [showCreateAccount, setShowCreateAccount] = useState(false)
@@ -26,7 +26,7 @@ function SignIn() {
       setKeyPair(new_keypair)
       //check if already in supabase
       const { data, error } = await supabase.from('User').select('npub').eq('npub', new_keypair.npub)
-      if (data && data.length == 0 && !error) {
+      if (data && data.length == 0 && !error) { //new user
         const { error: userCreationError } = await supabase.from('User').insert({ npub: keyPair.npub })
         if (userCreationError) {
           console.error(userCreationError)
@@ -39,6 +39,10 @@ function SignIn() {
         setErr('Supabase error')
         return
       }
+      const prof = await NostrService.getProfileInfo(keyPair.pk)
+      console.log({ prof })
+      const parsedProfile = JSON.parse(prof[0]?.content)
+      setProfile({ ...parsedProfile, created_at: prof[0]?.created_at })
       localStorage.setItem('keyPair', JSON.stringify(new_keypair))
       router.push('/profile')
 

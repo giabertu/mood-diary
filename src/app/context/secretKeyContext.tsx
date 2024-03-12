@@ -6,7 +6,16 @@ import { KeyPair, NostrService } from '../services/NostrService';
 import { useRouter } from 'next/router';
 import { DEFAULT_PROFILE, UserProfile } from '@/pages/profile';
 
-const AuthContext = createContext({ keyPair: { sk: new Uint8Array(), nsec: '', pk: '', npub: '' }, profile: DEFAULT_PROFILE, setKeyPair: (keypair: KeyPair) => { }, setProfile: (profile: UserProfile) => { }, following: [] as string[], setFollowing: (following: string[]) => { } });
+type AuthContextType = {
+  keyPair: KeyPair;
+  profile: UserProfile;
+  setKeyPair: (keypair: KeyPair) => void;
+  setProfile: (profile: UserProfile) => void;
+  following: string[] | null;
+  setFollowing: (following: string[]) => void;
+};
+
+const AuthContext = createContext<AuthContextType>({ keyPair: { sk: new Uint8Array(), nsec: '', pk: '', npub: '' }, profile: DEFAULT_PROFILE, setKeyPair: (keypair: KeyPair) => { }, setProfile: (profile: UserProfile) => { }, following: null, setFollowing: (following: string[]) => { } });
 
 export function useSkContext() {
   return useContext(AuthContext);
@@ -20,7 +29,7 @@ type SecretKeyProviderProps = {
 export function SecretKeyProvider({ children }: SecretKeyProviderProps) {
   const [keyPair, setKeyPair] = useState({ sk: new Uint8Array(), nsec: '', pk: '', npub: '' });
   const [profile, setProfile] = useState(DEFAULT_PROFILE)
-  const [following, setFollowing] = useState<string[]>([])
+  const [following, setFollowing] = useState<string[] | null>([])
   const router = useRouter()
 
   useEffect(() => {

@@ -8,7 +8,7 @@ import { supabase } from "../globals";
 
 function CreateAccount() {
 
-  const { keyPair, setKeyPair } = useSkContext()
+  const { keyPair, setKeyPair, setProfile } = useSkContext()
   const [err, setErr] = useState('')
   const [name, setName] = useState('')
   const [about, setabout] = useState('')
@@ -53,6 +53,9 @@ function CreateAccount() {
         setErr('Supabase error')
         return
       }
+      const prof = await NostrService.getProfileInfo(keyPair.pk)
+      const parsedProfile = JSON.parse(prof[0]?.content)
+      setProfile({ ...parsedProfile, created_at: prof[0]?.created_at })
       localStorage.setItem('keyPair', JSON.stringify(keyPair))
       router.push('/profile')
     } else {

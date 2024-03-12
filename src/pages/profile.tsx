@@ -38,7 +38,6 @@ export const DEFAULT_PROFILE: UserProfile = {
 function Profile() {
 
   const { keyPair, setKeyPair, setProfile, profile } = useSkContext()
-  // const [profile, setProfile] = useState(DEFAULT_PROFILE)
   const [posts, setPosts] = useState<Event[]>([])
   const router = useRouter()
 
@@ -74,8 +73,8 @@ function Profile() {
   };
 
   return (
-    <>
-      <div className="border border-gray-300 h-full p-2  flex flex-col gap-2">
+    <div id={keyPair.npub}>
+      <div className="border border-gray-300 h-full p-2  flex flex-col gap-2" >
         <div className="flex flex-col justify-between gap-1">
           <div className="relative flex flex-col ">
             <img src={profile.banner ? profile.banner : `/banner.jpg`} alt="banner" className="w-full" />
@@ -111,7 +110,7 @@ function Profile() {
           {posts.map((post, i) => <Post key={post.id} post={post} profile={profile}  addBorder={i !== posts.length - 1} />)}
         </div>
       </div>
-    </>
+    </div>
   )
 
 }
