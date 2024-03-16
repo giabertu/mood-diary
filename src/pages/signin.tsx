@@ -39,8 +39,14 @@ function SignIn() {
         setErr('Supabase error')
         return
       }
-      const prof = await NostrService.getProfileInfo(keyPair.pk)
+      console.log('keyPair before querying profile ', keyPair, new_keypair)
+      const prof = await NostrService.getProfileInfo(new_keypair.pk)
       console.log({ prof })
+      if (prof.length == 0) {
+        console.log('no profile found')
+        setErr('No profile associated with this private key. Please create a new account')
+        return
+      }
       const parsedProfile = JSON.parse(prof[0]?.content)
       setProfile({ ...parsedProfile, created_at: prof[0]?.created_at })
       localStorage.setItem('keyPair', JSON.stringify(new_keypair))

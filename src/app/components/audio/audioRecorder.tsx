@@ -34,34 +34,34 @@ const AudioRecorder = () => {
 
   const chunks = useRef([] as Blob[])
 
-  useEffect(() => {
+  // useEffect(() => {
 
-    const checkIfRecorded = async () => {
-      //check if the user has already recorded an entry for today
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const { data, error } = await supabase
-        .from('AudioFiles')
-        .select('*')
-        .gte('created_at', today.toISOString())
-      console.log('data ', data)
-      console.log('error ', error)
-      let typedData = data as DiaryEntry[] | null;
-      if (typedData && typedData.length > 0) {
-        setDiaryEntry(typedData[0]);
-        setHasRecorded(true);
-        const { data: audioUrl, error } = await supabase
-          .storage
-          .from('audio-files')
-          .createSignedUrl(typedData[0].filePath, 60 * 60)
-        console.log("audioUrl ", audioUrl, error)
-        if (audioUrl) {
-          setAudio(audioUrl.signedUrl)
-        }
-      }
-    }
-    checkIfRecorded();
-  }, [])
+  //   const checkIfRecorded = async () => {
+  //     //check if the user has already recorded an entry for today
+  //     const today = new Date();
+  //     today.setHours(0, 0, 0, 0);
+  //     const { data, error } = await supabase
+  //       .from('AudioFiles')
+  //       .select('*')
+  //       .gte('created_at', today.toISOString())
+  //     console.log('data ', data)
+  //     console.log('error ', error)
+  //     let typedData = data as DiaryEntry[] | null;
+  //     if (typedData && typedData.length > 0) {
+  //       setDiaryEntry(typedData[0]);
+  //       setHasRecorded(true);
+  //       const { data: audioUrl, error } = await supabase
+  //         .storage
+  //         .from('audio-files')
+  //         .createSignedUrl(typedData[0].filePath, 60 * 60)
+  //       console.log("audioUrl ", audioUrl, error)
+  //       if (audioUrl) {
+  //         setAudio(audioUrl.signedUrl)
+  //       }
+  //     }
+  //   }
+  //   checkIfRecorded();
+  // }, [])
 
 
   const startRecording = async () => {
@@ -148,7 +148,7 @@ const AudioRecorder = () => {
             </div> :
             <div>
               <p>You have already recorded an entry for today.</p>
-              <button onClick={() => setHasRecorded(false)}>Record a new entry</button>
+              <button onClick={() => setHasRecorded(false)}>Replace entry</button>
               {audio && <audio src={audio} controls></audio>}
             </div>
         }
