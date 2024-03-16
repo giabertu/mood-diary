@@ -1,55 +1,95 @@
-import React, { PureComponent } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import React, { PureComponent, useEffect, useRef, useState } from 'react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Dot } from 'recharts';
+import { DiaryEntry } from '@/app/services/DiaryService';
+import { DiaryEntryWithClass } from '@/pages/history';
 
-const data = [
-  {
-    name: 'Page A',
-    uv: 4000,
-    pv: 2400,
-    amt: 2400,
-  },
-  {
-    name: 'Page B',
-    uv: 3000,
-    pv: 1398,
-    amt: 2210,
-  },
-  {
-    name: 'Page C',
-    uv: 2000,
-    pv: 9800,
-    amt: 2290,
-  },
-  {
-    name: 'Page D',
-    uv: 2780,
-    pv: 3908,
-    amt: 2000,
-  },
-  {
-    name: 'Page E',
-    uv: 1890,
-    pv: 4800,
-    amt: 2181,
-  },
-  {
-    name: 'Page F',
-    uv: 2390,
-    pv: 3800,
-    amt: 2500,
-  },
-  {
-    name: 'Page G',
-    uv: 3490,
-    pv: 4300,
-    amt: 2100,
-  },
-];
+interface EmotionsChartProps {
+  data: DiaryEntry[] | null
+}
 
-function EmotionsChart() {
-  const demo = 'https://codesandbox.io/s/simple-line-chart-kec3v';
+enum Emotions {
+  Angry = 'Angry',
+  Disgusted = 'Disgusted',
+  Fearful = 'Fearful',
+  Happy = 'Happy',
+  Neutral = 'Neutral',
+  Sad = 'Sad'
+}
 
-    return (
+interface CustomTooltipProps {
+  active: boolean
+  payload: any
+  label: Emotions
+}
+
+function EmotionsChart({ data }: EmotionsChartProps) {
+
+
+ 
+  if (!data) {
+    return <p>Loading...</p>
+  }
+
+  if (data.length === 0) {
+    return <p>No data to display</p>
+  }
+
+
+  const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
+
+    console.log(active, payload, label)
+    if (active && payload && payload.length) {
+
+      const entry = payload[0].payload as DiaryEntryWithClass
+      const transcript = entry.transcript
+
+      const audioRef = useRef<HTMLAudioElement>(null);
+
+      useEffect(() => {
+        const handleKeyPress = (e: any) => {
+          e.preventDefault()
+          if (e.key === 'a') {
+            if (audioRef.current) {
+              audioRef.current.play().catch(error => console.log("Audio play error:", error));
+            }
+          }
+          if (e.key === 's'){
+            if (audioRef.current) {
+              audioRef.current.pause();
+            }
+          }
+        };
+        window.addEventListener('keypress', handleKeyPress);
+        return () => {
+          window.removeEventListener('keypress', handleKeyPress);
+        };
+      }, []);
+    
+
+      return (
+        <div className="custom-tooltip bg-white p-2">
+          <div className="flex items-center gap-2">
+            <p className='text-gray-500'> Predicted Emotion</p>
+            <p className='font-bold'>{entry.modelPredictedEmotion}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <p className='text-gray-500'>User Emotion</p>
+            <p className='font-bold'>{entry.userPredictedEmotion}</p>
+          </div>
+          {entry.audioUrl && <audio ref={audioRef} src={entry.audioUrl} controls />}
+          <p className="desc text-xs max-w-[20rem]">{transcript}</p>
+        </div>
+      );
+    }
+
+    return null;
+  };
+
+
+  return (
+    <>
+    <p>Press "a" when hovering on an entry to toggle play audio!</p>
+    <p>Press "s" to stop the audio from playing </p>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
           width={500}
@@ -63,15 +103,18 @@ function EmotionsChart() {
           }}
         >
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
+          <XAxis dataKey="modelPredictedEmotion" />
           <YAxis />
-          <Tooltip />
+          {/* @ts-ignore */}
+          <Tooltip content={<CustomTooltip />} />
           <Legend />
-          <Line type="monotone" dataKey="pv" stroke="#8884d8" activeDot={{ r: 8 }} />
-          <Line type="monotone" dataKey="uv" stroke="#82ca9d" />
+          {/* @ts-ignore */}
+          <Line type="monotone" dataKey="modelClass" stroke="#8884d8" s />
+          <Line type="monotone" dataKey="userClass" stroke="#228B22" activeDot={{ r: 8 }} />
         </LineChart>
       </ResponsiveContainer>
-    );
+    </>
+  );
 }
 
 export default EmotionsChart;

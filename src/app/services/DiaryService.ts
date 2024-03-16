@@ -1,4 +1,5 @@
-import { Failed, supabase } from '../globals'
+import { DiaryEntryWithClass } from '@/pages/history'
+import { EmotionClasses, Failed, supabase } from '../globals'
 
 export type ProcessedDiaryEntryResponse = {
   message: string,
@@ -59,7 +60,7 @@ class DiaryService {
   }
 
   static async saveDiaryEntry(processedEntry: ProcessedDiaryEntryResponse, npub: string) {
-    const { filePath, transcript, modelPredictedEmotion} = processedEntry;
+    const { filePath, transcript, modelPredictedEmotion } = processedEntry;
     const { data, error } = await supabase
       .from('AudioFiles')
       .insert([
@@ -92,6 +93,42 @@ class DiaryService {
       return { status: 'success', message: 'User feedback added successfully.' };
     }
   }
+
+  static async getUserEntriesWithClass(npub: string): Promise<DiaryEntryWithClass[]> {
+
+    console.log("npub in getEntryByUser: ", npub)
+    const { data: diaryEntry, error } = await supabase
+      .from('AudioFiles')
+      .select('*')
+      .eq('user', npub) as { data: DiaryEntry[], error: any }
+    if (error) {
+      console.error(error);
+      return [];
+    } else {
+      const filePaths = diaryEntry.map(entry => entry.filePath)
+
+      const { data: audioUrls, error } = await supabase
+        .storage
+        .from('audio-files')
+        .createSignedUrls(filePaths, 60 * 60 * 24)
+ 
+      const dataWithClass = diaryEntry.map((entry, i) => {
+        let url = null
+        if (!error) {
+          url = audioUrls[i].signedUrl
+        }
+        const modelEmo = entry.modelPredictedEmotion as keyof typeof EmotionClasses
+        const userEmo = entry.userPredictedEmotion as keyof typeof EmotionClasses
+        return { ...entry, modelClass: EmotionClasses[modelEmo], userClass: userEmo ? EmotionClasses[userEmo] : EmotionClasses[modelEmo], audioUrl: url }
+      })
+
+      console.log("dataWithClass in getEntryByUser: ", dataWithClass)
+      return dataWithClass;
+    }
+
+  }
+
+
 }
 
 export default DiaryService;

@@ -58,3 +58,13 @@ export const getDate = (timestamp: number) => {
     }
 
   }
+
+
+  export const EmotionClasses = {
+    "Angry": -3,
+    "Disgusted": -2,
+    "Fearful": -1,
+    "Happy": 4,
+    "Neutral": 2,
+    "Sad": -4,
+  }
