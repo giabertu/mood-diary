@@ -111,7 +111,8 @@ const AudioRecorder = () => {
           console.error(processedResponse);
           setErr(processedResponse.message);
         } else {
-          setDiaryEntry({ user: keyPair.npub, filePath: processedResponse.filePath, transcript: processedResponse.transcript, modelPredictedEmotion: processedResponse.modelPredictedEmotion });
+          const { textEmotion, hybridEmotion } = JSON.parse(processedResponse.llmRes);
+          setDiaryEntry({ user: keyPair.npub, filePath: processedResponse.filePath, transcript: processedResponse.transcript, modelPredictedEmotion: processedResponse.modelPredictedEmotion, textEmotion, hybridEmotion });
           const savedRes = await DiaryService.saveDiaryEntry(processedResponse, keyPair.npub);
           console.log('savedRes ', savedRes);
         }
@@ -154,12 +155,25 @@ const AudioRecorder = () => {
         }
         {diaryEntry &&
           <div>
-            <p>Your predicted emotion of today is: {diaryEntry.modelPredictedEmotion}.</p>
+            <p>Your predicted emotion of today is: {diaryEntry.hybridEmotion}.</p>
             <div className='flex gap-2 '>
               <p>Not quite right?</p><button onClick={() => setOpenFeedback(true)}>Provide Feedback</button>
             </div>
             {openFeedback &&
               <div>
+                <p>Our models have predicted the following emotions.</p>
+                <div className='flex gap-2'>
+                  <p>From Audio Features:</p>
+                  <p>{diaryEntry.modelPredictedEmotion}</p>
+                </div>
+                <div className='flex gap-2'>
+                  <p>From Text Features:</p>
+                  <p>{diaryEntry.textEmotion}</p>
+                </div>
+                <div className='flex gap-2'>
+                  <p>Final prediction:</p>
+                  <p>{diaryEntry.hybridEmotion}</p>
+                </div>
                 <p>What was your emotion?</p>
                 <div className='flex gap-2'>
                   {Emotions.filter((e) => e !== diaryEntry.modelPredictedEmotion).map((emotion) => <button key={emotion} onClick={() => addFeedback(emotion)}>{emotion}</button>)}

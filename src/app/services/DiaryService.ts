@@ -7,6 +7,7 @@ export type ProcessedDiaryEntryResponse = {
   userPredictedEmotion?: string
   filePath: string,
   transcript: string
+  llmRes: string //JSON string, type: {textEmotion: string, hybridEmotion: string}
 }
 
 export type DiaryEntry = {
@@ -15,6 +16,8 @@ export type DiaryEntry = {
   transcript: string,
   modelPredictedEmotion: string,
   userPredictedEmotion?: string
+  textEmotion: string,
+  hybridEmotion: string
 }
 
 
@@ -60,7 +63,8 @@ class DiaryService {
   }
 
   static async saveDiaryEntry(processedEntry: ProcessedDiaryEntryResponse, npub: string) {
-    const { filePath, transcript, modelPredictedEmotion } = processedEntry;
+    const { filePath, transcript, modelPredictedEmotion, llmRes } = processedEntry;
+    const { textEmotion, hybridEmotion } = JSON.parse(llmRes)
     const { data, error } = await supabase
       .from('AudioFiles')
       .insert([
@@ -69,6 +73,8 @@ class DiaryService {
           filePath,
           transcript,
           modelPredictedEmotion,
+          textEmotion,
+          hybridEmotion,
         }
       ])
     if (error) {
@@ -111,15 +117,21 @@ class DiaryService {
         .storage
         .from('audio-files')
         .createSignedUrls(filePaths, 60 * 60 * 24)
- 
+
       const dataWithClass = diaryEntry.map((entry, i) => {
         let url = null
         if (!error) {
           url = audioUrls[i].signedUrl
         }
-        const modelEmo = entry.modelPredictedEmotion as keyof typeof EmotionClasses
-        const userEmo = entry.userPredictedEmotion as keyof typeof EmotionClasses
-        return { ...entry, modelClass: EmotionClasses[modelEmo], userClass: userEmo ? EmotionClasses[userEmo] : EmotionClasses[modelEmo], audioUrl: url }
+
+        //turns the emotion strings into their corresponding class numbers
+        const modelClass = EmotionClasses[entry.modelPredictedEmotion as keyof typeof EmotionClasses]
+        const textEmotionClass = EmotionClasses[entry.textEmotion as keyof typeof EmotionClasses]
+        const hybridEmotionClass = EmotionClasses[entry.hybridEmotion as keyof typeof EmotionClasses]
+        //if the user has not given feedback, the userClass is the same as the hybridEmotionClass (happy with the model's prediction)
+        const userClass = entry.userPredictedEmotion ? EmotionClasses[entry.userPredictedEmotion as keyof typeof EmotionClasses] : hybridEmotionClass
+
+        return { ...entry, textEmotionClass, hybridEmotionClass, modelClass, userClass, audioUrl: url }
       })
 
       console.log("dataWithClass in getEntryByUser: ", dataWithClass)

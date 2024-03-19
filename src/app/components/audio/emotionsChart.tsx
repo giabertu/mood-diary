@@ -55,7 +55,7 @@ function EmotionsChart({ data }: EmotionsChartProps) {
           }
           if (e.key === 's'){
             if (audioRef.current) {
-              audioRef.current.pause();
+            audioRef.current.pause()
             }
           }
         };
@@ -70,7 +70,7 @@ function EmotionsChart({ data }: EmotionsChartProps) {
         <div className="custom-tooltip bg-white p-2">
           <div className="flex items-center gap-2">
             <p className='text-gray-500'> Predicted Emotion</p>
-            <p className='font-bold'>{entry.modelPredictedEmotion}</p>
+            <p className='font-bold'>{entry.hybridEmotion}</p>
           </div>
           <div className="flex items-center gap-2">
             <p className='text-gray-500'>User Emotion</p>
@@ -102,14 +102,14 @@ function EmotionsChart({ data }: EmotionsChartProps) {
             bottom: 5,
           }}
         >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="modelPredictedEmotion" />
+          {/* <CartesianGrid strokeDasharray="3 3" /> */}
+          <XAxis dataKey="hybridEmotion" />
           <YAxis />
           {/* @ts-ignore */}
           <Tooltip content={<CustomTooltip />} />
           <Legend />
           {/* @ts-ignore */}
-          <Line type="monotone" dataKey="modelClass" stroke="#8884d8" s />
+          <Line type="monotone" dataKey="hybridEmotionClass" stroke="#8884d8" s />
           <Line type="monotone" dataKey="userClass" stroke="#228B22" activeDot={{ r: 8 }} />
         </LineChart>
       </ResponsiveContainer>
