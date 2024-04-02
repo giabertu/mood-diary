@@ -19,7 +19,7 @@ function Layout({ children }: LayoutProps) {
 
   const router = useRouter()
   const { keyPair, setKeyPair } = useSkContext()
-  
+
   useEffect(() => {
     if (localStorage.getItem('keyPair') === null) {
       setKeyPair(DEFAULT_KEYPAIR)
@@ -29,11 +29,17 @@ function Layout({ children }: LayoutProps) {
 
 
   return (
-    <div className='h-full flex flex-col justify-start items-center'>
+    <div style={{ 
+      backgroundImage: "linear-gradient(to top, #fbc2eb 0%, #a6c1ee 100%)",
+      backgroundAttachment: 'fixed',
+      backgroundSize: 'cover',
+     }}
+      className='h-full flex flex-col justify-start items-center'>
       <Navbar />
       <div className='flex w-full h-4/5'>
         <Tabs />
-        <main className=' w-1/2  h-full'>{children}</main>
+        <main className=' w-1/2  h-full 
+        backdrop-filter backdrop-blur-md bg-white bg-opacity-30 rounded-md'>{children}</main>
         <Sidebar />
       </div>
       <Footer />

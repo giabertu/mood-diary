@@ -42,8 +42,6 @@ function Home() {
 
   return (
     <div>
-      <h1>Home</h1>
-
       {/* feed */}
       <div className="flex flex-col w-full">
         {feed.map((post, i) => <Post key={post.id} post={post} profile={null} addBorder={i !== feed.length - 1} />)}

@@ -173,7 +173,8 @@ function Post({ post, profile, addBorder = true, kind = "post", OP }: PostProps)
 
   return (
     <>
-      <div className={`flex flex-col gap-2 py-4 px-2 ${kind === 'reply' && 'px-6 py-2'} min-w-full ${addBorder ? "border border-gray-300 border-t-0 border-x-0" : ""}`}>
+      <div className={`
+      flex flex-col gap-2 py-4 px-2 ${kind === 'reply' && 'px-6 py-2'} min-w-full ${addBorder ? "border border-gray-400 border-t-0 border-x-0" : ""}`}>
         {isRepost && reposterProfile && <p className="text-gray-500 flex gap-2 items-center"
           onClick={(e) => {
             e.stopPropagation();
