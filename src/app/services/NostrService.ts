@@ -247,7 +247,40 @@ class NostrService {
     if (kind3.length == 0) return []
     let following = kind3[0].tags.filter((arrString: string[]) => isValidPk(arrString[1]) && arrString[1])
     return following.map((arrString: string[]) => arrString[1])
+  }
 
+  //pass pk for user to follow, not npub!
+  static async followProfile(pk: string, followingNoP: string[],  keyPair: KeyPair) {
+    const newFollowing = ['p', pk]
+    const following = followingNoP.map(pubKey => ['p', pubKey])
+    const { data } = nip19.decode(keyPair.nsec)
+    const newData = data as Uint8Array
+    const newFollowList = finalizeEvent({
+      kind: 3,
+      content: "",
+      tags: [...following, newFollowing],
+      created_at: Math.floor(Date.now() / 1000)
+    }, newData)
+    const isGood = verifyEvent(newFollowList)
+    const e = await Promise.any(pool.publish(DEFAULT_RELAYS, newFollowList))
+    console.log({ e })
+    return e
+  }
+
+  static async unfollowProfile(pk: string, followingNoP: string[], keyPair: KeyPair) {
+    const following = followingNoP.map(pubKey => ['p', pubKey])
+    const { data } = nip19.decode(keyPair.nsec)
+    const newData = data as Uint8Array
+    const newFollowList = finalizeEvent({
+      kind: 3,
+      content: "",
+      tags: following.filter(arr => arr[1] !== pk),
+      created_at: Math.floor(Date.now() / 1000)
+    }, newData)
+    const isGood = verifyEvent(newFollowList)
+    const e = await Promise.any(pool.publish(DEFAULT_RELAYS, newFollowList))
+    console.log({ e })
+    return e
   }
 
   static async getProfileInfo(pk: string) {

@@ -38,7 +38,7 @@ function Layout({ children }: LayoutProps) {
       <Navbar />
       <div className='flex w-full h-4/5'>
         <Tabs />
-        <main className=' w-1/2  h-full 
+        <main className=' w-1/2  min-h-[90vh]
         backdrop-filter backdrop-blur-md bg-white bg-opacity-30 rounded-md'>{children}</main>
         <Sidebar />
       </div>

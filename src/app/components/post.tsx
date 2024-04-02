@@ -35,7 +35,7 @@ function Post({ post, profile, addBorder = true, kind = "post", OP }: PostProps)
   const [liked, setLiked] = useState<boolean>(false)
   const [reposted, setReposted] = useState<boolean>(false)
   const [commented, setCommented] = useState<boolean>(false)
-  const [showReplies, setShowReplies] = useState<boolean>(kind == 'post') 
+  const [showReplies, setShowReplies] = useState<boolean>(kind == 'post')
 
 
   const [hidePost, setHidePost] = useState<boolean>(false) //if a repost is untoggled in profile or user tabs (not post or home feed)
@@ -44,13 +44,6 @@ function Post({ post, profile, addBorder = true, kind = "post", OP }: PostProps)
   const isRepost = post.kind === 6;
   const ogPost = isRepost ? JSON.parse(post.content) : post;
   const { keyPair } = useSkContext()
-
-
-  // Event handler for clicking the username
-  const handleUsernameClick = (pubkey: string, profileName: string) => {
-    localStorage.setItem('userInfo', JSON.stringify({ profile: newProfile, pubKey: ogPost.pubkey }))
-    router.push(`/user/${nip19.npubEncode(pubkey)}`, `/user/${profileName}`);
-  };
 
   useEffect(() => {
     if (ogPost.content.includes('https://')) {
@@ -66,8 +59,10 @@ function Post({ post, profile, addBorder = true, kind = "post", OP }: PostProps)
       if (isRepost) {
         if (profile) {
           const ogProf = await NostrService.getProfileInfo(ogPost.pubkey) // get the original profile of the reposted post
-          const parsedOgProf = JSON.parse(ogProf[0]?.content)
-          setNewProfile({ ...parsedOgProf, created_at: ogProf[0]?.created_at })
+          if (ogProf[0].content) {
+            const parsedOgProf = JSON.parse(ogProf[0]?.content)
+            setNewProfile({ ...parsedOgProf, created_at: ogProf[0]?.created_at })
+          }
           setReposterProfile(profile)
         } else {
           const [ogProf, repProf] = await Promise.all([
@@ -84,8 +79,10 @@ function Post({ post, profile, addBorder = true, kind = "post", OP }: PostProps)
           setNewProfile(profile)
         } else {
           const prof = await NostrService.getProfileInfo(ogPost.pubkey)
-          const parsedProfile = JSON.parse(prof[0]?.content)
-          setNewProfile({ ...parsedProfile, created_at: prof[0]?.created_at })
+          if (prof[0].content) {
+            const parsedProfile = JSON.parse(prof[0]?.content)
+            setNewProfile({ ...parsedProfile, created_at: prof[0]?.created_at })
+          }
         }
       }
 
@@ -179,8 +176,7 @@ function Post({ post, profile, addBorder = true, kind = "post", OP }: PostProps)
           onClick={(e) => {
             e.stopPropagation();
             if (reposterProfile) {
-              localStorage.setItem('userInfo', JSON.stringify({ profile: reposterProfile, pubKey: post.pubkey }))
-              router.push(`/user/${nip19.npubEncode(post.pubkey)}`, `/user/${reposterProfile.name}`);
+              router.push(`/user/${nip19.npubEncode(post.pubkey)}`);
             }
           }}><ArrowPathRoundedSquareIcon className="w-6" /> <span>by {reposterProfile?.display_name}</span></p>}
         <div className="flex gap-2 w-full">
@@ -196,7 +192,7 @@ function Post({ post, profile, addBorder = true, kind = "post", OP }: PostProps)
             <div className="flex gap-2 text-sm w-full justify-between">
               <div className="flex gap-2 hover:underline cursor-pointer" onClick={(e) => {
                 e.stopPropagation();
-                newProfile && handleUsernameClick(ogPost.pubkey, newProfile.name);
+                newProfile && router.push(`/user/${nip19.npubEncode(ogPost.pubkey)}`);
               }}>
                 <p className="font-bold">{newProfile && newProfile.display_name}</p>
                 <p className="text-gray-500">{newProfile && newProfile.name}</p>
@@ -219,27 +215,27 @@ function Post({ post, profile, addBorder = true, kind = "post", OP }: PostProps)
         </div>
       </div>
       {(showReplies && router.asPath.includes("post") && postReplies.length > 0) && <div className="flex flex-col gap-2 p-2">
-          {postReplies.filter(reply => {
-            // to implement...
-            // handle differently depending on post, comment, reply?
-            // if (kind === "post")  just show comments
-            // if (kind === comment or reply) show ALL replies
-            if (kind === 'comment' || kind === 'reply') return true
-            let count = 0; 
-            reply.tags.forEach(tag => {
-              if (tag[0] == 'e'){
-                count++
-              } 
-            })
-            return count === 1 
-          }).map((reply, i) => <Post
-            key={reply.id}
-            kind={kind === "post" ? "comment" : "reply"}
-            OP={newProfile} 
-            post={reply}
-            profile={null}
-            addBorder={i !== postReplies.length - 1} />)}
-        </div>
+        {postReplies.filter(reply => {
+          // to implement...
+          // handle differently depending on post, comment, reply?
+          // if (kind === "post")  just show comments
+          // if (kind === comment or reply) show ALL replies
+          if (kind === 'comment' || kind === 'reply') return true
+          let count = 0;
+          reply.tags.forEach(tag => {
+            if (tag[0] == 'e') {
+              count++
+            }
+          })
+          return count === 1
+        }).map((reply, i) => <Post
+          key={reply.id}
+          kind={kind === "post" ? "comment" : "reply"}
+          OP={newProfile}
+          post={reply}
+          profile={null}
+          addBorder={i !== postReplies.length - 1} />)}
+      </div>
       }
     </>
   );
