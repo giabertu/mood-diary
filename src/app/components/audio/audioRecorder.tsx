@@ -4,6 +4,7 @@ import DiaryService, { DiaryEntry, ProcessedDiaryEntryResponse } from '@/app/ser
 import { MicrophoneIcon, StopIcon } from '@heroicons/react/24/solid';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { supabase } from '@/app/globals';
+import AudioBars from '../audioBars';
 
 const Emotions = [
   'Angry',
@@ -134,14 +135,19 @@ const AudioRecorder = () => {
 
   return (
     <>
-      <div className='flex flex-col gap-4'>
+      <div className='flex flex-col gap-4 h-full w-full'>
         {
           !hasRecorded ?
-            <div className='flex gap-4 '>
-              {!isRecording && !audio && <button className="border border-gray-300 rounded-3xl p-4 flex items-center gap-4"
-                onClick={startRecording}><MicrophoneIcon className='w-10' /></button>}
-              {isRecording && !audio && <button className="border border-gray-300 rounded-3xl p-4 flex items-center gap-4"
-                onClick={stopRecording}><StopIcon className='w-10' /></button>}
+            <div className='flex gap-4 flex-col text-gray-700 p-4 items-center debug h-full w-full '>
+              <h2 className='text-4xl font-bold text-center'>Record a journal entry and find out your emotional state.</h2>
+              {!isRecording && !audio && <button 
+                className="border border-gray-700 rounded-3xl p-4 flex items-center gap-4 font-bold text-lg
+                hover:rounded-md transition-all ease-in "
+                onClick={startRecording}><MicrophoneIcon className='w-8'/>Start Recording</button>}
+              {isRecording && !audio && <button 
+                className="border border-gray-700 rounded-3xl p-5 flex items-center gap-4 font-bold text-lg
+                hover:rounded-md transition-all ease-in "
+                onClick={startRecording}><AudioBars colorClass='text-red-700' />Stop Recording</button>}
               {audio && <audio src={audio} controls></audio>}
               {audio && <button onClick={() => setAudio('')}>Delete</button>}
               {audio && <button onClick={postAudio}>Save</button>}
