@@ -1,7 +1,7 @@
 import EmotionsChart from "@/app/components/audio/emotionsChart";
 import { useSkContext } from "@/app/context/secretKeyContext";
 import DiaryService, { DiaryEntry } from "@/app/services/DiaryService";
-import { BackwardIcon, ForwardIcon } from "@heroicons/react/24/outline";
+import { ArrowsPointingInIcon, ArrowsPointingOutIcon, BackwardIcon, ForwardIcon, MagnifyingGlassIcon, MagnifyingGlassPlusIcon } from "@heroicons/react/24/outline";
 import { use, useEffect, useState } from "react";
 
 export type DiaryEntryWithClass = DiaryEntry & { modelClass: number, userClass: number, audioUrl?: string | null }
@@ -11,6 +11,7 @@ function History() {
 
   const [data, setData] = useState<DiaryEntry[]>([])
   const [currentIdx, setCurrentIdx] = useState<number>(5)
+  const [isZoomedOut, setIsZoomedOut] = useState<boolean>(false)
   const { keyPair } = useSkContext()
 
   useEffect(() => {
@@ -41,13 +42,26 @@ function History() {
   return (
     <div className="flex flex-col gap-10 p-4 items-center text-gray-700">
       <h1 className="text-3xl font-bold">History</h1>
-      <div className=" w-[50rem] h-[35rem] debug">
-        <EmotionsChart data={data.slice(-5 + currentIdx, currentIdx >= data.length ? data.length : currentIdx)} />
+      <div className=" w-[40rem] h-[35rem] relative">
+        <button
+          className="flex items-center justify-center gap-2 text-blue-700 text-lg absolute top-[-30px] right-[-30px]"
+          onClick={() => setIsZoomedOut(!isZoomedOut)}
+        >{isZoomedOut ? <>
+          Zoom In
+          <ArrowsPointingInIcon className="w-6" />
+        </>
+          :
+          <>
+            Zoom Out
+            <ArrowsPointingOutIcon className="w-6" />
+          </>
+          }</button>
+        <EmotionsChart data={isZoomedOut ? data : data.slice(-5 + currentIdx, currentIdx >= data.length ? data.length : currentIdx)} />
       </div>
       <div className="flex gap-8">
         <button
           onClick={onBackward}
-          disabled={currentIdx === 5}
+          disabled={currentIdx === 5 || isZoomedOut}
           className='p-2 flex items-center gap-2 font-bold text-lg
           rounded-md transition-all ease-in
           disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-transparent
@@ -57,18 +71,14 @@ function History() {
 
         <button
           onClick={onForward}
-          disabled={currentIdx >= data.length}
+          disabled={currentIdx >= data.length || isZoomedOut}
           className='p-2 flex items-center gap-2 font-bold text-lg
           rounded-md transition-all ease-in
           disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-transparent
           hover:bg-blue-500 hover:bg-opacity-40 hover:text-blue-800
           disabled:hover:bg-transparent disabled:hover:text-current'
-        >Next 5 entries <ForwardIcon className="w-6" /></button>
-
-      </div>
-      <div className="self-start">
-        <p className="text-lg font-semibold px-4">Press "a" when hovering on an entry to toggle play audio</p>
-        <p className='text-lg font-semibold px-4'>Press "s" to stop the audio from playing </p>
+        >Next 5 entries <ForwardIcon className="w-6" />
+        </button>
       </div>
     </div>
   );
