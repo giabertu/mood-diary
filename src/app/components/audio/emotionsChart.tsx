@@ -2,6 +2,8 @@ import React, { PureComponent, useEffect, useRef, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Dot } from 'recharts';
 import { DiaryEntry } from '@/app/services/DiaryService';
 import { DiaryEntryWithClass } from '@/pages/history';
+import { NewspaperIcon } from '@heroicons/react/24/outline';
+
 
 interface EmotionsChartProps {
   data: DiaryEntry[] | null
@@ -25,7 +27,7 @@ interface CustomTooltipProps {
 function EmotionsChart({ data }: EmotionsChartProps) {
 
 
- 
+
   if (!data) {
     return <p>Loading...</p>
   }
@@ -53,9 +55,9 @@ function EmotionsChart({ data }: EmotionsChartProps) {
               audioRef.current.play().catch(error => console.log("Audio play error:", error));
             }
           }
-          if (e.key === 's'){
+          if (e.key === 's') {
             if (audioRef.current) {
-            audioRef.current.pause()
+              audioRef.current.pause()
             }
           }
         };
@@ -64,20 +66,29 @@ function EmotionsChart({ data }: EmotionsChartProps) {
           window.removeEventListener('keypress', handleKeyPress);
         };
       }, []);
-    
+
 
       return (
-        <div className="custom-tooltip bg-white p-2">
+        <div className=" p-4 text-gray-700 flex flex-col gap-4 rounded-md
+        backdrop-filter backdrop-blur-md bg-white bg-opacity-80 
+        ">
           <div className="flex items-center gap-2">
-            <p className='text-gray-500'> Predicted Emotion</p>
-            <p className='font-bold'>{entry.hybridEmotion}</p>
+            <p className='text-gray-500'> Predicted Emotion:</p>
+            <p
+              style={{ backgroundImage: "linear-gradient(to right, #b8cbb8 0%, #b8cbb8 0%, #b465da 0%, #cf6cc9 33%, #ee609c 66%, #ee609c 100%)" }}
+              className='font-bold bg-clip-text text-transparent'>{entry.hybridEmotion}</p>
           </div>
           <div className="flex items-center gap-2">
-            <p className='text-gray-500'>User Emotion</p>
-            <p className='font-bold'>{entry.userPredictedEmotion}</p>
+            <p className='text-gray-500'>User Emotion:</p>
+            <p
+              style={{ backgroundImage: "linear-gradient(to right, #f83600 0%, #f9d423 100%)" }}
+              className='font-bold bg-clip-text text-transparent'>{entry.userPredictedEmotion || "N/A" }</p>
           </div>
           {entry.audioUrl && <audio ref={audioRef} src={entry.audioUrl} controls />}
-          <p className="desc text-xs max-w-[20rem]">{transcript}</p>
+          <div>
+            <p className='text-gray-500 flex items-center gap-1'><NewspaperIcon className='w-6' />Transcript:</p>
+            <p className="font-medium max-w-[23rem]">{transcript}</p>
+          </div>
         </div>
       );
     }
@@ -100,7 +111,6 @@ function EmotionsChart({ data }: EmotionsChartProps) {
             bottom: 5,
           }}
         >
-          {/* <CartesianGrid strokeDasharray="3 3" /> */}
           <XAxis dataKey="created_at" />
           <YAxis />
           {/* @ts-ignore */}
