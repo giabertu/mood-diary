@@ -151,7 +151,7 @@ const AudioRecorder = () => {
   const shareOnNostr = async () => {
     if (diaryEntry) {
       setTweetStatus({ isPosting: true, hasPosted: false })
-      let content = `My predicted emotion of today is {diaryEntry!.hybridEmotion}. ~Posted with Mood-Diary!`
+      let content = `My predicted emotion of today is ${diaryEntry.hybridEmotion}. ~Posted with Mood-Diary!`
       const res = await NostrService.postTweet(content, keyPair);
       console.log('res ', res);
       setTweetStatus({ isPosting: false, hasPosted: true })
@@ -173,7 +173,7 @@ const AudioRecorder = () => {
     )
   }
 
-  if (true) {
+  if (diaryEntry) {
     return (
       <div className='flex flex-col gap-8 h-full w-full py-10'>
         <div className='flex gap-10 flex-col text-gray-700 p-4 items-center debug h-full w-full'>
