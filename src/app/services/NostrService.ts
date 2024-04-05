@@ -252,7 +252,11 @@ class NostrService {
 
   static async getProfileFollowers(pk: string) {
     let followers = await pool.querySync(DEFAULT_RELAYS, { kinds: [3], "#p": [pk] })
-    return followers
+    console.log("followers in nostrservice ", { followers })
+    if (followers.length == 0) return []
+    // let followersList = followers.map((event: Event) => {event.pubkey, event.content}) //check the content if you want relay info
+    let followersList = followers.map((event: Event) => event.pubkey)
+    return followersList
   }
 
   static async getProfileFollowing(pk: string) {
@@ -263,6 +267,8 @@ class NostrService {
     let following = kind3[0].tags.filter((arrString: string[]) => isValidPk(arrString[1]) && arrString[1])
     return following.map((arrString: string[]) => arrString[1])
   }
+
+
 
   //pass pk for user to follow, not npub!
   static async followProfile(pk: string, followingNoP: string[], keyPair: KeyPair) {

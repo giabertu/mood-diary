@@ -1,4 +1,5 @@
 import { useRouter } from "next/router"
+import ProfileSidebar from "./sidebar/profileSidebar"
 
 
 
@@ -27,6 +28,10 @@ function Sidebar() {
         </div>
       </div>
     )
+  }
+
+  if (router.asPath.includes('/profile')) {
+    return <ProfileSidebar />
   }
 
 

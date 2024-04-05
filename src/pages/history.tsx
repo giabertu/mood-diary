@@ -9,7 +9,7 @@ export type DiaryEntryWithClass = DiaryEntryWithCreatedAt & { modelClass: number
 
 function History() {
 
-  const [data, setData] = useState<DiaryEntry[]>([])
+  const [data, setData] = useState<DiaryEntryWithClass[]>([])
   const [currentIdx, setCurrentIdx] = useState<number>(5)
   const [isZoomedOut, setIsZoomedOut] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(true)

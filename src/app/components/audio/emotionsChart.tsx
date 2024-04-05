@@ -1,6 +1,5 @@
 import React, { PureComponent, useEffect, useRef, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Dot } from 'recharts';
-import { DiaryEntry } from '@/app/services/DiaryService';
 import { DiaryEntryWithClass } from '@/pages/history';
 import { NewspaperIcon } from '@heroicons/react/24/outline';
 
