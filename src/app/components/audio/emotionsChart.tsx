@@ -88,8 +88,6 @@ function EmotionsChart({ data }: EmotionsChartProps) {
 
   return (
     <>
-    <p>Press "a" when hovering on an entry to toggle play audio!</p>
-    <p>Press "s" to stop the audio from playing </p>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
           width={500}
@@ -103,7 +101,7 @@ function EmotionsChart({ data }: EmotionsChartProps) {
           }}
         >
           {/* <CartesianGrid strokeDasharray="3 3" /> */}
-          <XAxis dataKey="hybridEmotion" />
+          <XAxis dataKey="created_at" />
           <YAxis />
           {/* @ts-ignore */}
           <Tooltip content={<CustomTooltip />} />

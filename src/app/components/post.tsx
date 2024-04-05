@@ -59,7 +59,7 @@ function Post({ post, profile, addBorder = true, kind = "post", OP }: PostProps)
       if (isRepost) {
         if (profile) {
           const ogProf = await NostrService.getProfileInfo(ogPost.pubkey) // get the original profile of the reposted post
-          if (ogProf[0].content) {
+          if (ogProf[0]?.content) {
             const parsedOgProf = JSON.parse(ogProf[0]?.content)
             setNewProfile({ ...parsedOgProf, created_at: ogProf[0]?.created_at })
           }
@@ -69,6 +69,7 @@ function Post({ post, profile, addBorder = true, kind = "post", OP }: PostProps)
             NostrService.getProfileInfo(ogPost.pubkey),
             NostrService.getProfileInfo(post.pubkey)
           ])
+        
           const parsedOgProf = JSON.parse(ogProf[0]?.content)
           const parsedRepProf = JSON.parse(repProf[0]?.content)
           setNewProfile({ ...parsedOgProf, created_at: ogProf[0]?.created_at })
@@ -79,7 +80,7 @@ function Post({ post, profile, addBorder = true, kind = "post", OP }: PostProps)
           setNewProfile(profile)
         } else {
           const prof = await NostrService.getProfileInfo(ogPost.pubkey)
-          if (prof[0].content) {
+          if (prof[0]?.content) {
             const parsedProfile = JSON.parse(prof[0]?.content)
             setNewProfile({ ...parsedProfile, created_at: prof[0]?.created_at })
           }

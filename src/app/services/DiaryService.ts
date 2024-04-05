@@ -15,9 +15,10 @@ export type DiaryEntry = {
   filePath: string,
   transcript: string,
   modelPredictedEmotion: string,
-  userPredictedEmotion?: string
+  userPredictedEmotion?: string,
   textEmotion: string,
-  hybridEmotion: string
+  hybridEmotion: string,
+  created_at: string
 }
 
 
@@ -111,6 +112,7 @@ class DiaryService {
       console.error(error);
       return [];
     } else {
+      console.log("diaryEntry in getEntryByUser: ", diaryEntry)
       const filePaths = diaryEntry.map(entry => entry.filePath)
 
       const { data: audioUrls, error } = await supabase
@@ -131,7 +133,7 @@ class DiaryService {
         //if the user has not given feedback, the userClass is the same as the hybridEmotionClass (happy with the model's prediction)
         const userClass = entry.userPredictedEmotion ? EmotionClasses[entry.userPredictedEmotion as keyof typeof EmotionClasses] : hybridEmotionClass
 
-        return { ...entry, textEmotionClass, hybridEmotionClass, modelClass, userClass, audioUrl: url }
+        return { ...entry, textEmotionClass, created_at: new Date(entry.created_at).toLocaleDateString(), hybridEmotionClass, modelClass, userClass, audioUrl: url }
       })
 
       console.log("dataWithClass in getEntryByUser: ", dataWithClass)

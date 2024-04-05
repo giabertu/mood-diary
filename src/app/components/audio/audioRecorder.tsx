@@ -156,7 +156,7 @@ const AudioRecorder = () => {
     )
   }
 
-  if (true) {
+  if (diaryEntry) {
     return (
       <div className='flex flex-col gap-8 h-full w-full py-10'>
         <div className='flex gap-10 flex-col text-gray-700 p-4 items-center debug h-full w-full'>
@@ -164,7 +164,7 @@ const AudioRecorder = () => {
             <h2 className='text-3xl font-bold text-center'>Your predicted emotion of today is:</h2>
             <p className="bg-clip-text text-transparent text-5xl font-bold text-center"
               style={{ backgroundImage: "linear-gradient(to right, #2874a6, #cc1f1a)" }}>
-              Neutral{diaryEntry?.hybridEmotion}
+              {diaryEntry?.hybridEmotion}
             </p>
           </div>
           <div className='flex gap-2 items-center'>
@@ -177,12 +177,7 @@ const AudioRecorder = () => {
               <NewspaperIcon className='w-6' />
               View transcript</button>
           </div>
-          {showTranscript &&
-            <p className='text-lg font-semibold px-4'>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptas sed quidem eos provident saepe ab accusantium dolorum expedita illum odio veniam mollitia nobis modi, culpa distinctio magni laudantium, unde tempora?
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Earum est, asperiores dolores voluptates animi eum fugit totam, magnam temporibus maiores id. Rerum impedit reiciendis nulla quo laboriosam itaque, quae facilis.
-              {diaryEntry?.transcript}</p>
-          }
+          {showTranscript && <p className='text-lg font-semibold px-4'>{diaryEntry?.transcript}</p>}
           <div className='p-4 flex gap-2 items-center '>
             <p className='text-lg font-bold text-center'>Not quite right?</p>
             <button onClick={() => setOpenFeedback(prev => !prev)}
@@ -207,13 +202,13 @@ const AudioRecorder = () => {
               {success && <p className='text-green-500'>{success}</p>}
               <p className='text-lg font-semibold text-center px-4'>Our hybrid model approach allows us to estimate audio features and semantic information separately. Based on audio features, our model predicted the emotion to be
                 <span className="bg-clip-text text-transparent font-bold"
-                  style={{ backgroundImage: "linear-gradient(to right, #2874a6, #cc1f1a)" }}> Happy{diaryEntry?.modelPredictedEmotion}</span>.
+                  style={{ backgroundImage: "linear-gradient(to right, #2874a6, #cc1f1a)" }}> {diaryEntry?.modelPredictedEmotion}</span>.
                 Based on semantic information, it predicted
                 <span className="bg-clip-text text-transparent font-bold text-center"
-                  style={{ backgroundImage: "linear-gradient(to right, #2874a6, #cc1f1a)" }}> Disgusted{diaryEntry?.textEmotion}</span>, giving us an hybrid and final emotion of
+                  style={{ backgroundImage: "linear-gradient(to right, #2874a6, #cc1f1a)" }}> {diaryEntry?.textEmotion}</span>, giving us an hybrid and final emotion of 
                 <span className="bg-clip-text text-transparent font-bold text-center"
-                  style={{ backgroundImage: "linear-gradient(to right, #2874a6, #cc1f1a)" }}> Sad
-                  {diaryEntry?.hybridEmotion}</span>.</p>
+                  style={{ backgroundImage: "linear-gradient(to right, #2874a6, #cc1f1a)" }}> 
+                  {" " + diaryEntry?.hybridEmotion}</span>.</p>
             </div>
           }
         </div>
@@ -225,11 +220,11 @@ const AudioRecorder = () => {
 
   return (
     <>
-      <div className='flex flex-col gap-8 h-full w-full'>
+      <div className='flex flex-col gap-8 h-full w-full py-10'>
         {
           !hasRecorded && !isProcessing && !diaryEntry ?
-            <div className='flex gap-8 flex-col text-gray-700 p-4 items-center debug h-full w-full '>
-              <h2 className='text-4xl font-bold text-center'>Record a journal entry and find out your emotional state.</h2>
+            <div className='flex gap-20 flex-col text-gray-700 p-4 items-center debug h-full w-full '>
+              <h2 className='text-3xl font-bold text-center'>Record a journal entry and find out your emotional state.</h2>
               {!audio && <button
                 className="border border-gray-700 rounded-3xl p-4 flex items-center gap-4 font-bold text-lg
                 hover:rounded-md transition-all ease-in "
@@ -250,7 +245,6 @@ const AudioRecorder = () => {
             hover:bg-green-500 hover:bg-opacity-40 hover:text-green-800'
               ><DocumentCheckIcon className='w-6' />Save Diary Entry</button>}
               {err && <p className=' text-red-500'>{err}</p>}
-              <img src='/check.svg' className=' w-32' />
             </div> :
             <div>
               <p>You have already recorded an entry for today.</p>
