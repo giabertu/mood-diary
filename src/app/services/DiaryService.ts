@@ -18,8 +18,9 @@ export type DiaryEntry = {
   userPredictedEmotion?: string,
   textEmotion: string,
   hybridEmotion: string,
-  created_at: string
 }
+
+export type DiaryEntryWithCreatedAt = DiaryEntry & { created_at: string }
 
 
 
@@ -107,7 +108,7 @@ class DiaryService {
     const { data: diaryEntry, error } = await supabase
       .from('AudioFiles')
       .select('*')
-      .eq('user', npub) as { data: DiaryEntry[], error: any }
+      .eq('user', npub) as { data: DiaryEntryWithCreatedAt[], error: any }
     if (error) {
       console.error(error);
       return [];

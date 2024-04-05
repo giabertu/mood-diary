@@ -6,7 +6,8 @@ import { NewspaperIcon } from '@heroicons/react/24/outline';
 
 
 interface EmotionsChartProps {
-  data: DiaryEntry[] | null
+  data: DiaryEntryWithClass[] | null,
+  isLoading: boolean
 }
 
 enum Emotions {
@@ -24,16 +25,28 @@ interface CustomTooltipProps {
   label: Emotions
 }
 
-function EmotionsChart({ data }: EmotionsChartProps) {
+function EmotionsChart({ data, isLoading }: EmotionsChartProps) {
 
 
 
-  if (!data) {
-    return <p>Loading...</p>
+  if (isLoading) {
+    return (
+      <div className='flex flex-col gap-8 h-full w-full py-10'>
+        <div className='flex gap-20 flex-col text-gray-700 p-4 items-center h-full w-full'>
+          <img src='/gridLoader.svg' className='w-32' />
+        </div>
+      </div>
+    )
   }
 
-  if (data.length === 0) {
-    return <p>No data to display</p>
+  if ((data && data.length === 0)) {
+    return (
+      <div className='flex flex-col gap-8 h-full w-full py-10'>
+        <div className='flex gap-20 flex-col text-gray-700 p-4 items-center h-full w-full'>
+          <p className='text-3xl font-bold text-center'>Your diary is empty. Go to the record page and save your first entry!</p>
+        </div>
+      </div>
+    )
   }
 
 
@@ -82,7 +95,7 @@ function EmotionsChart({ data }: EmotionsChartProps) {
             <p className='text-gray-500'>User Emotion:</p>
             <p
               style={{ backgroundImage: "linear-gradient(to right, #f83600 0%, #f9d423 100%)" }}
-              className='font-bold bg-clip-text text-transparent'>{entry.userPredictedEmotion || "N/A" }</p>
+              className='font-bold bg-clip-text text-transparent'>{entry.userPredictedEmotion || "N/A"}</p>
           </div>
           {entry.audioUrl && <audio ref={audioRef} src={entry.audioUrl} controls />}
           <div>
@@ -96,33 +109,34 @@ function EmotionsChart({ data }: EmotionsChartProps) {
     return null;
   };
 
-
-  return (
-    <>
-      <ResponsiveContainer width="100%" height="100%">
-        <LineChart
-          width={500}
-          height={300}
-          data={data}
-          margin={{
-            top: 5,
-            right: 30,
-            left: 20,
-            bottom: 5,
-          }}
-        >
-          <XAxis dataKey="created_at" />
-          <YAxis />
-          {/* @ts-ignore */}
-          <Tooltip content={<CustomTooltip />} />
-          <Legend />
-          {/* @ts-ignore */}
-          <Line type="monotone" dataKey="hybridEmotionClass" stroke="#8884d8" s />
-          <Line type="monotone" dataKey="userClass" stroke="#228B22" activeDot={{ r: 8 }} />
-        </LineChart>
-      </ResponsiveContainer>
-    </>
-  );
+  if (data) {
+    return (
+      <>
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart
+            width={500}
+            height={300}
+            data={data}
+            margin={{
+              top: 5,
+              right: 30,
+              left: 20,
+              bottom: 5,
+            }}
+          >
+            <XAxis dataKey="created_at" />
+            <YAxis />
+            {/* @ts-ignore */}
+            <Tooltip content={<CustomTooltip />} />
+            <Legend />
+            {/* @ts-ignore */}
+            <Line type="monotone" dataKey="hybridEmotionClass" stroke="#8884d8" s />
+            <Line type="monotone" dataKey="userClass" stroke="#228B22" activeDot={{ r: 8 }} />
+          </LineChart>
+        </ResponsiveContainer>
+      </>
+    );
+  }
 }
 
 export default EmotionsChart;

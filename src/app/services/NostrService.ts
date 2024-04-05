@@ -204,6 +204,21 @@ class NostrService {
     return e
   }
 
+
+  static async postTweet(content: string, keyPair: KeyPair) {
+    const { type, data } = nip19.decode(keyPair.nsec)
+    const newData = data as Uint8Array
+    const tweetEvent = finalizeEvent({
+      kind: 1,
+      content,
+      tags: [],
+      created_at: Math.floor(Date.now() / 1000)
+    }, newData)
+    const isGood = verifyEvent(tweetEvent)
+    const e = await Promise.any(pool.publish(DEFAULT_RELAYS, tweetEvent))
+    return e
+  }
+
   //nip-18
   static async repostPost(ogE: Event, keyPair: KeyPair) {
     const { data } = nip19.decode(keyPair.nsec)
@@ -250,7 +265,7 @@ class NostrService {
   }
 
   //pass pk for user to follow, not npub!
-  static async followProfile(pk: string, followingNoP: string[],  keyPair: KeyPair) {
+  static async followProfile(pk: string, followingNoP: string[], keyPair: KeyPair) {
     const newFollowing = ['p', pk]
     const following = followingNoP.map(pubKey => ['p', pubKey])
     const { data } = nip19.decode(keyPair.nsec)
