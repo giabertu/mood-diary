@@ -31,7 +31,7 @@ function Tabs() {
 
   return (
     <div className='w-1/4  border border-gray-300 p-2 border-r-0'>
-      <div className="sticky top-20 flex flex-col gap-8 items-start pl-20">
+      <div className="sticky top-20 flex flex-col gap-8 items-start pl-20 p-4">
         <button className="
         backdrop-filter backdrop-blur-md bg-white bg-opacity-30 
         hover:rounded-md transition-all ease-in

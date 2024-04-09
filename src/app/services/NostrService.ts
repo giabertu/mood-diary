@@ -252,7 +252,7 @@ class NostrService {
 
   static async getProfileFollowers(pk: string) {
     let followers = await pool.querySync(DEFAULT_RELAYS, { kinds: [3], "#p": [pk] })
-    console.log("followers in nostrservice ", { followers })
+  console.log("followers in nostrservice ", { followers })
     if (followers.length == 0) return []
     // let followersList = followers.map((event: Event) => {event.pubkey, event.content}) //check the content if you want relay info
     let followersList = followers.map((event: Event) => event.pubkey)
