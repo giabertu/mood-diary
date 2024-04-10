@@ -28,12 +28,24 @@ function Layout({ children }: LayoutProps) {
   }, [])
 
 
+  if (router.asPath.includes('/signin')) {
+    return (
+      <div style={{
+        backgroundImage: "linear-gradient(to top, #fbc2eb 0%, #a6c1ee 100%)",
+        backgroundAttachment: 'fixed',
+        backgroundSize: 'cover',
+      }}
+        className='h-full flex flex-col justify-start items-center text-gray-700'>
+        {children}
+      </div>)
+  }
+
   return (
-    <div style={{ 
+    <div style={{
       backgroundImage: "linear-gradient(to top, #fbc2eb 0%, #a6c1ee 100%)",
       backgroundAttachment: 'fixed',
       backgroundSize: 'cover',
-     }}
+    }}
       className='h-full flex flex-col justify-start items-center'>
       <Navbar />
       <div className='flex w-full h-4/5'>

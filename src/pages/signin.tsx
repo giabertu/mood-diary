@@ -4,7 +4,7 @@ import "../app/styles/globals.css";
 import { hasFailed, supabase } from '@/app/globals';
 import { useSkContext } from '@/app/context/secretKeyContext';
 import { useRouter } from 'next/router';
-import { DocumentDuplicateIcon } from '@heroicons/react/24/outline'
+import { ArrowRightEndOnRectangleIcon, DocumentDuplicateIcon } from '@heroicons/react/24/outline'
 import CreateAccount from '@/app/components/createAccount';
 
 function SignIn() {
@@ -70,14 +70,16 @@ function SignIn() {
   }, [])
 
   return (
-    <div className='flex w-screen debug items-center justify-center h-screen'>
+    <div className='flex w-screen items-center justify-center h-screen'>
       <div className=' min-h-80 flex flex-col gap-4 bg-white rounded-md p-8 shadow-md max-w-[45rem]'>
         {showCreateAccount ?
           <CreateAccount /> :
           <>
             <h1 className='text-3xl font-bold'>Sign in to your account</h1>
             <p className=''>Mood-Diary connects to the Nostr protocol to provide social features.
-              To sign in to your Nostr account, paste your private key below</p>
+              To sign in to your Nostr account, paste your  <span style={{ backgroundImage: "linear-gradient(to right, #b8cbb8 0%, #b8cbb8 0%, #b465da 0%, #cf6cc9 33%, #ee609c 66%, #ee609c 100%)" }} className='bg-clip-text text-transparent'>
+                private key
+              </span> below</p>
             <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
               <textarea
                 name="secret key"
@@ -88,11 +90,21 @@ function SignIn() {
                 onChange={handleChange}
               />
               {err && <p className='text-red-500'>{err}</p>}
-              <button type="submit">Sign In</button>
+              <button
+                type='submit'
+                className='font-bold flex gap-2 text-lg items-center hover:ml-5 transition-all ease-in self-center'
+              >
+                <ArrowRightEndOnRectangleIcon className='w-6' />
+                <span style={{ backgroundImage: "linear-gradient(to right, #b8cbb8 0%, #b8cbb8 0%, #b465da 0%, #cf6cc9 33%, #ee609c 66%, #ee609c 100%)" }} className='bg-clip-text text-transparent'>
+                  Sign In
+                </span>
+              </button>
             </form>
           </>
         }
-        <button onClick={() => setShowCreateAccount(prev => !prev)}>{showCreateAccount ? "I already have a private key" : "New to Nostr?"} </button>
+        <button
+          className='font-semibold flex gap-2 text-base items-center hover:ml-5 transition-all ease-in self-center'
+          onClick={() => setShowCreateAccount(prev => !prev)}>{showCreateAccount ? "I already have a private key" : "New to Nostr?"} </button>
       </div>
     </div>
   )

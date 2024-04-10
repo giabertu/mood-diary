@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useSkContext } from "../context/secretKeyContext";
 import { NostrService } from "../services/NostrService";
-import { DocumentDuplicateIcon } from "@heroicons/react/24/outline";
+import { ArrowRightEndOnRectangleIcon, DocumentDuplicateIcon, ExclamationTriangleIcon, KeyIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/router";
 import { finalizeEvent, verifyEvent } from "nostr-tools";
 import { supabase } from "../globals";
@@ -67,27 +67,48 @@ function CreateAccount() {
   return (
     <>
       <h1 className='text-3xl font-bold'>Create a new account</h1>
-      <p className=''>All you need to be able to login into your Nostr (and therefore Mood-diary) account is a private key. Other people will be able to find you using your public key.</p>
-      {(!keyPair.nsec || keyPair.nsec == 'nsec1') && <button onClick={handleGenerate}>Generate private key</button>}
-      {keyPair.nsec && keyPair.nsec !== 'nsec1' &&
-        <div className='flex flex-col gap-2'>
-          <div>
-            <p>Your private key</p>
+      <p className=''>All you need to be able to login into your Nostr (and therefore Mood-diary) account is a  <span style={{ backgroundImage: "linear-gradient(to right, #b8cbb8 0%, #b8cbb8 0%, #b465da 0%, #cf6cc9 33%, #ee609c 66%, #ee609c 100%)" }} className='bg-clip-text text-transparent'>
+        private key
+      </span>. Other people will be able to find you using your  <span style={{ backgroundImage: "linear-gradient(to right, #b8cbb8 0%, #b8cbb8 0%, #b465da 0%, #cf6cc9 33%, #ee609c 66%, #ee609c 100%)" }} className='bg-clip-text text-transparent'>
+          public key
+        </span>.</p>
+      {(!keyPair.nsec || keyPair.nsec == 'nsec1') && <button
+        className='font-bold flex gap-2 text-lg items-center hover:ml-5 transition-all ease-in self-center mt-5'
+        onClick={handleGenerate}
+      >
+        <KeyIcon className='w-6' />
+        <span style={{ backgroundImage: "linear-gradient(to right, #b8cbb8 0%, #b8cbb8 0%, #b465da 0%, #cf6cc9 33%, #ee609c 66%, #ee609c 100%)" }} className='bg-clip-text text-transparent'>
+          Generate a new key pair
+        </span>
+      </button>}
+      {
+        keyPair.nsec && keyPair.nsec !== 'nsec1' &&
+        <div className='flex flex-col gap-4'>
+          <div className="flex flex-col gap-2">
+            <p
+              style={{ backgroundImage: "linear-gradient(to right, #b8cbb8 0%, #b8cbb8 0%, #b465da 0%, #cf6cc9 33%, #ee609c 66%, #ee609c 100%)" }}
+              className='text-lg font-bold bg-clip-text text-transparent'>
+              Your private key</p>
             <div className='flex gap-2 bg-slate-100 rounded-md p-2 items-center justify-between'>
               <p className='text-green-500'>{keyPair.nsec}</p>
               <DocumentDuplicateIcon onClick={() => copyToClipboard(keyPair.nsec)}
                 className='h-4 w-4 justify-end' />
             </div>
           </div>
-          <div>
-            <p>Your public key</p>
+          <div className="flex flex-col gap-2">
+            <p
+              style={{ backgroundImage: "linear-gradient(to right, #b8cbb8 0%, #b8cbb8 0%, #b465da 0%, #cf6cc9 33%, #ee609c 66%, #ee609c 100%)" }}
+              className='text-lg font-bold bg-clip-text text-transparent'>
+              Your public key</p>
             <div className='flex gap-2 bg-slate-100 rounded-md p-2 items-center justify-between'>
               <p className='text-green-500'>{keyPair.npub}</p>
               <DocumentDuplicateIcon onClick={() => copyToClipboard(keyPair.npub)}
                 className='h-4 w-4 justify-end' />
             </div>
           </div>
-          <p>Save these keys somewhere safe. You will need the private key to login into your account.</p>
+          <p className=" bg-slate-100 p-2 flex gap-4 rounded-md"><ExclamationTriangleIcon className="w-6" />
+            Keep your keys safe. You will need the private key to login into your account.
+          </p>
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div className="flex gap-8 w-full">
               <input
@@ -109,9 +130,17 @@ function CreateAccount() {
               value={about}
               className="w-full border border-gray-300 rounded-md p-2"
               onChange={(e) => setabout(e.target.value)}
-              placeholder='Your about' />
+              placeholder='Your biography' />
 
-            <button type="submit">Log me in</button>
+            <button
+              type='submit'
+              className='font-bold flex gap-2 text-lg items-center hover:ml-5 transition-all ease-in self-center'
+            >
+              <ArrowRightEndOnRectangleIcon className='w-6' />
+              <span style={{ backgroundImage: "linear-gradient(to right, #b8cbb8 0%, #b8cbb8 0%, #b465da 0%, #cf6cc9 33%, #ee609c 66%, #ee609c 100%)" }} className='bg-clip-text text-transparent'>
+                Log In
+              </span>
+            </button>
           </form>
         </div>
       }
