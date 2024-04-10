@@ -305,8 +305,19 @@ class NostrService {
   }
 
   static async getProfileInfo(pk: string) {
-    let info = await pool.querySync(DEFAULT_RELAYS, { kinds: [0], authors: [pk] })
-    return info
+    console.log("pk in getProfileInfo ", pk)
+    let found = false; 
+    let tries = 0;
+    while (!found  && tries < 3){
+      let info = await pool.querySync(DEFAULT_RELAYS, { kinds: [0], authors: [pk] })
+      console.log("Profil in getProfileInfo ", {info})
+      if (info.length > 0) {
+        found = true
+        return info
+      }
+      tries++
+    }
+    return []
   }
 
   static async publishEvent(newEvent: Event) {

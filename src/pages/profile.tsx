@@ -87,7 +87,7 @@ function Profile() {
               />
             </div>
             <div className="flex justify-end items-center  w-full min-h-20">
-              <button className="border border-gray-300 rounded-3xl p-2">edit profile</button>
+              {/* <button className="border border-gray-300 rounded-3xl p-2">edit profile</button> */}
             </div>
           </div>
           <div className="flex w-full justify-between">
@@ -95,7 +95,7 @@ function Profile() {
               <h1 className=" font-bold text-lg ">{profile.display_name}</h1>
               <p className="text-gray-500">{profile.name}</p>
             </div>
-            <p className="text-gray-500 text-sm">{"joined " + getDate(profile.created_at)}</p>
+            {/* <p className="text-gray-500 text-sm">{"joined " + getDate(profile.created_at)}</p> */}
           </div>
           <div className="flex gap-2 text-sm text-gray-500 items-center">
             <p>{keyPair.npub.slice(0, 8) + '...' + keyPair.npub.slice(-5)}</p>

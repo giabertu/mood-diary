@@ -62,6 +62,8 @@ function Post({ post, profile, addBorder = true, kind = "post", OP }: PostProps)
           if (ogProf[0]?.content) {
             const parsedOgProf = JSON.parse(ogProf[0]?.content)
             setNewProfile({ ...parsedOgProf, created_at: ogProf[0]?.created_at })
+          } else {
+            console.error("Profile not found", { isRepost, post, ogPost, ogProf })
           }
           setReposterProfile(profile)
         } else {
@@ -69,7 +71,10 @@ function Post({ post, profile, addBorder = true, kind = "post", OP }: PostProps)
             NostrService.getProfileInfo(ogPost.pubkey),
             NostrService.getProfileInfo(post.pubkey)
           ])
-        
+
+          if (!ogProf[0]?.content || !repProf[0]?.content) {
+            console.error("Profile not found", { isRepost, post, ogPost, ogProf, repProf})
+          }
           const parsedOgProf = JSON.parse(ogProf[0]?.content)
           const parsedRepProf = JSON.parse(repProf[0]?.content)
           setNewProfile({ ...parsedOgProf, created_at: ogProf[0]?.created_at })
@@ -83,6 +88,8 @@ function Post({ post, profile, addBorder = true, kind = "post", OP }: PostProps)
           if (prof[0]?.content) {
             const parsedProfile = JSON.parse(prof[0]?.content)
             setNewProfile({ ...parsedProfile, created_at: prof[0]?.created_at })
+          } else {
+            console.error("Profile not found", { isRepost, post, ogPost })
           }
         }
       }
@@ -114,7 +121,7 @@ function Post({ post, profile, addBorder = true, kind = "post", OP }: PostProps)
 
 
   if (postReplies.length > 0 && kind === 'post') {
-    console.log({ postId: post.id, postReplies })
+    // console.log({ postId: post.id, postReplies })
   }
 
 
