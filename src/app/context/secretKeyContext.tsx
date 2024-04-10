@@ -39,6 +39,7 @@ export function SecretKeyProvider({ children }: SecretKeyProviderProps) {
   useEffect(() => {
     console.log("running useEffect in skConetxt")
     async function getState() {
+      NostrService.connectToRelays()
       const storedKeys = localStorage.getItem('keyPair')
       if (storedKeys) {
         const parsedKeys = JSON.parse(storedKeys)

@@ -67,7 +67,9 @@ function Tabs() {
         <button className="
         backdrop-filter backdrop-blur-md bg-white bg-opacity-30 
         hover:rounded-md transition-all ease-in
-        border border-gray-300 rounded-3xl p-4 flex items-center gap-4">
+        border border-gray-300 rounded-3xl p-4 flex items-center gap-4"
+          onClick={() => router.push('/settings')}
+        >
           <Cog6ToothIcon className="w-6" /> Settings
         </button>
         <button className="

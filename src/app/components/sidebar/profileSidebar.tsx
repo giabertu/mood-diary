@@ -6,6 +6,7 @@ function ProfileSidebar() {
 
   const { keyPair, following, profile, followers } = useSkContext()
 
+  console.log("In profile sidebar: ", {following, followers})
 
   return (
     <div className='w-1/4 border border-gray-300 border-l-0 p-2'>
