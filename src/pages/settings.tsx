@@ -1,6 +1,7 @@
 import { useSkContext } from "@/app/context/secretKeyContext";
 import { DEFAULT_RELAYS } from "@/app/globals";
-import { DocumentDuplicateIcon, ExclamationTriangleIcon } from "@heroicons/react/24/outline"
+import { DocumentDuplicateIcon, ExclamationTriangleIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline"
+import { useState } from "react";
 
 
 
@@ -9,6 +10,7 @@ import { DocumentDuplicateIcon, ExclamationTriangleIcon } from "@heroicons/react
 function Settings() {
 
   const { keyPair, profile } = useSkContext()
+  const [isKeyVisible, setIsKeyVisible] = useState(false);
 
   const copyToClipboard = async (text: string) => {
     try {
@@ -26,13 +28,13 @@ function Settings() {
         <div className="relative flex justify-between w-full items-center">
           <h1 className='text-2xl font-bold'>Settings</h1>
           <div className="w-14 h-14 rounded-full justify-self-center absolute right-0 overflow-hidden flex items-center justify-center">
-              <img
-                src={profile.picture ? profile.picture : `/icon.svg`}
-                alt="profile picture"
-                className="absolute w-full h-full object-cover"
-                style={{ objectFit: 'cover', width: '100%', height: '100%' }}
-              />
-            </div>
+            <img
+              src={profile.picture ? profile.picture : `/icon.svg`}
+              alt="profile picture"
+              className="absolute w-full h-full object-cover"
+              style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+            />
+          </div>
         </div>
         <div className="flex flex-col gap-2">
           <p
@@ -40,10 +42,17 @@ function Settings() {
             className='text-lg font-bold bg-clip-text text-transparent'>
             Your private key</p>
           <div className='flex gap-2 bg-slate-200 bg-opacity-40 rounded-md p-2 items-center justify-between'>
-            <p className='text-green-500'>{keyPair.nsec}</p>
-            <DocumentDuplicateIcon
-              onClick={() => copyToClipboard(keyPair.nsec)}
-              className='h-4 w-4 justify-end cursor-pointer' />
+            <p className={`${isKeyVisible ? 'text-green-500' : ''}`}>{isKeyVisible ? keyPair.nsec : '•••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••'}</p>
+            <div className="flex gap-2">
+              {isKeyVisible ? <EyeSlashIcon onClick={() => setIsKeyVisible(!isKeyVisible)}
+                className="h-4 w-4 justify-end cursor-pointer " /> :
+                <EyeIcon
+                  onClick={() => setIsKeyVisible(!isKeyVisible)}
+                  className="h-4 w-4 justify-end cursor-pointer " />}
+              <DocumentDuplicateIcon
+                onClick={() => copyToClipboard(keyPair.nsec)}
+                className='h-4 w-4 justify-end cursor-pointer' />
+            </div>
           </div>
         </div>
         <div className="flex flex-col gap-2">
