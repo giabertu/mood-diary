@@ -172,7 +172,18 @@ class NostrService {
   }
 
   static async getPostEngagement(id: string) {
-    let res = await pool.querySync(DEFAULT_RELAYS, { kinds: [1, 6, 7], "#e": [id] }) //replies, reposts, reactions
+    console.log("Id in getPostEngagement ", { id })
+    let found = false;
+    let tries = 0;
+    let res: Event[] = []
+    while (!found && tries < 2) {
+      res = await pool.querySync(DEFAULT_RELAYS, { kinds: [1, 6, 7], "#e": [id] }) //replies, reposts, reactions
+      console.log("res in getPostEngagement ", { res, id })
+      if (res.length > 0) {
+        found = true
+      }
+      tries++
+    }
     const replies: Event[] = []
     const reactions: Event[] = []
     const reposts: Event[] = []
@@ -252,7 +263,7 @@ class NostrService {
 
   static async getProfileFollowers(pk: string) {
     let followers = await pool.querySync(DEFAULT_RELAYS, { kinds: [3], "#p": [pk] })
-  console.log("followers in nostrservice ", { followers })
+    console.log("followers in nostrservice ", { followers })
     if (followers.length == 0) return []
     // let followersList = followers.map((event: Event) => {event.pubkey, event.content}) //check the content if you want relay info
     let followersList = followers.map((event: Event) => event.pubkey)
@@ -305,12 +316,12 @@ class NostrService {
   }
 
   static async getProfileInfo(pk: string) {
-    console.log("pk in getProfileInfo ", pk)
-    let found = false; 
+    // console.log("pk in getProfileInfo ", pk)
+    let found = false;
     let tries = 0;
-    while (!found  && tries < 3){
+    while (!found && tries < 3) {
       let info = await pool.querySync(DEFAULT_RELAYS, { kinds: [0], authors: [pk] })
-      console.log("Profil in getProfileInfo ", {info})
+      // console.log("Profil in getProfileInfo ", {info})
       if (info.length > 0) {
         found = true
         return info

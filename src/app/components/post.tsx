@@ -101,6 +101,7 @@ function Post({ post, profile, addBorder = true, kind = "post", OP }: PostProps)
   useEffect(() => {
     async function getPostInfo() {
       const postEng = await NostrService.getPostEngagement(ogPost.id)
+      console.log("Here is post eng ", { postEng })
       setPostReplies(postEng.replies)
       setPostReactions(postEng.reactions)
       setPostReposts(postEng.reposts)
