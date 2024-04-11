@@ -165,7 +165,7 @@ const AudioRecorder = () => {
   if (isProcessing) {
     return (
       <div className='flex flex-col gap-8 h-full w-full py-10'>
-        <div className='flex gap-20 flex-col text-gray-700 p-4 items-center debug h-full w-full'>
+        <div className='flex gap-20 flex-col text-gray-700 p-4 items-center  h-full w-full'>
           <h2 className='text-3xl font-bold text-center'>Processing audio, this may take a while.</h2>
           <img src='/gridLoader.svg' className='w-32' />
         </div>
@@ -176,7 +176,7 @@ const AudioRecorder = () => {
   if (diaryEntry) {
     return (
       <div className='flex flex-col gap-8 h-full w-full py-10'>
-        <div className='flex gap-10 flex-col text-gray-700 p-4 items-center debug h-full w-full'>
+        <div className='flex gap-10 flex-col text-gray-700 p-4 items-center h-full w-full'>
           <div className='flex flex-col gap-8 items-center justify-center'>
             <h2 className='text-3xl font-bold text-center'>Your predicted emotion of today is:</h2>
             <p className="bg-clip-text text-transparent text-5xl font-bold text-center"
@@ -254,7 +254,7 @@ const AudioRecorder = () => {
       <div className='flex flex-col gap-8 h-full w-full py-10'>
         {
           !hasRecorded && !isProcessing && !diaryEntry ?
-            <div className='flex gap-20 flex-col text-gray-700 p-4 items-center debug h-full w-full '>
+            <div className='flex gap-20 flex-col text-gray-700 p-4 items-center h-full w-full '>
               <h2 className='text-3xl font-bold text-center'>Record a journal entry and find out your emotional state.</h2>
               {!audio && <button
                 className="border border-gray-700 rounded-3xl p-4 flex items-center gap-4 font-bold text-lg

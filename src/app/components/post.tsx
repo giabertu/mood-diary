@@ -48,7 +48,7 @@ function Post({ post, profile, addBorder = true, kind = "post", OP }: PostProps)
   const ogPost = isRepost ? JSON.parse(post.content) : post;
   const { keyPair, profilesCache, setProfilesCache } = useSkContext()
 
-  console.log({ post, kind, isRepost, ogPost })
+  // console.log({ post, kind, isRepost, ogPost })
 
   useEffect(() => {
     if (ogPost.content.includes('https://')) {
@@ -154,7 +154,7 @@ function Post({ post, profile, addBorder = true, kind = "post", OP }: PostProps)
   useEffect(() => {
     async function getPostInfo() {
       const postEng = await NostrService.getPostEngagement(ogPost.id)
-      console.log("Here is post eng ", { postEng })
+      // console.log("Here is post eng ", { postEng })
       setPostReplies(postEng.replies)
       setPostReactions(postEng.reactions)
       setPostReposts(postEng.reposts)

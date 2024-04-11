@@ -7,7 +7,7 @@ function RecordPage() {
 
 
   return (
-    <div className="h-full w-full debug">
+    <div className="h-full w-full">
       <AudioRecorder />
     </div>
   )

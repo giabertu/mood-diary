@@ -4,7 +4,7 @@ import "../app/styles/globals.css";
 import { hasFailed, supabase } from '@/app/globals';
 import { useSkContext } from '@/app/context/secretKeyContext';
 import { useRouter } from 'next/router';
-import { ArrowRightEndOnRectangleIcon, DocumentDuplicateIcon } from '@heroicons/react/24/outline'
+import { ArrowRightEndOnRectangleIcon, DocumentDuplicateIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'
 import CreateAccount from '@/app/components/createAccount';
 
 function SignIn() {
@@ -13,6 +13,7 @@ function SignIn() {
   const [sk, setSecret] = useState('')
   const [err, setErr] = useState('')
   const [showCreateAccount, setShowCreateAccount] = useState(false)
+  const [isKeyVisible, setIsKeyVisible] = useState(false)
 
   const router = useRouter()
 
@@ -55,7 +56,7 @@ function SignIn() {
     }
   }
 
-  const handleChange = (e: React.FormEvent<HTMLTextAreaElement>) => {
+  const handleChange = (e: React.FormEvent<HTMLInputElement>) => {
     const value = e.currentTarget.value
     setSecret(value)
   }
@@ -81,14 +82,24 @@ function SignIn() {
                 private key
               </span> below</p>
             <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
-              <textarea
-                name="secret key"
-                required={true}
-                value={sk}
-                className='p-2 border border-gray-300 rounded-md'
-                rows={3}
-                onChange={handleChange}
-              />
+              <div className='relative w-full text-gray-700'>
+                <input
+                  name="secret key"
+                  required={true}
+                  value={sk}
+                  className='p-2 border border-gray-300 rounded-md w-full'
+                  // rows={3}
+                  type={isKeyVisible ? 'text' : 'password'}
+                  onChange={handleChange}
+                />
+                <div className='absolute right-3 top-[0.6rem]'>
+                  {isKeyVisible ? <EyeSlashIcon onClick={() => setIsKeyVisible(!isKeyVisible)}
+                    className="w-6 justify-end cursor-pointer " /> :
+                    <EyeIcon
+                      onClick={() => setIsKeyVisible(!isKeyVisible)}
+                      className="w-6 justify-end cursor-pointer " />}
+                </div>
+              </div>
               {err && <p className='text-red-500'>{err}</p>}
               <button
                 type='submit'

@@ -5,7 +5,7 @@ function Navbar() {
 
   const router = useRouter()
 
-  console.log(router.asPath)
+  // console.log(router.asPath)
 
   //hide in signin page
   if (router.asPath.includes("/signin")) return null

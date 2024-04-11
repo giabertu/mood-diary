@@ -42,10 +42,10 @@ function CreateAccount() {
     }, keyPair.sk)
 
     let isGood = verifyEvent(event)
-    console.log({ isGood, event })
+    // console.log({ isGood, event })
 
     const res = await NostrService.publishEvent(event)
-    console.log({ res })
+    // console.log({ res })
     if (res) {
       const { error } = await supabase.from('User').insert({ npub: keyPair.npub })
       if (error) {

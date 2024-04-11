@@ -44,7 +44,7 @@ function Attachment({ urls }: AttachmentProps) {
         if (i !== currentAttachment) return null
         if (url.endsWith('.mp4')) return <video key={url} src={url} className=" max-h-96" controls />
         if (url.includes("www.youtube.com") || url.includes("youtu.be")) {
-          console.log(url)
+          // console.log(url)
           return <iframe key={url} width="560" height="315" src={convertYouTubeLinkToEmbedURL(url)} title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
         }
         if (url.endsWith('jpg') || url.endsWith('png') || url.endsWith('jpeg')) {
