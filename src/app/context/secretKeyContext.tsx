@@ -15,10 +15,13 @@ type AuthContextType = {
   setFollowing: (following: string[]) => void;
   followers: string[] | null;
   setFollowers: (followers: string[]) => void;
+  profilesCache: Map<string, UserProfile> | null;
+  setProfilesCache: Dispatch<SetStateAction<Map<string, UserProfile> | null>>
+  // eventsCache: Map<string, string[]>;
 
 };
 
-const AuthContext = createContext<AuthContextType>({ keyPair: { sk: new Uint8Array(), nsec: '', pk: '', npub: '' }, profile: DEFAULT_PROFILE, setKeyPair: (keypair: KeyPair) => { }, setProfile: (profile: UserProfile) => { }, following: null, setFollowing: (following: string[]) => { }, followers: null, setFollowers: (followers: string[]) => { }});
+const AuthContext = createContext<AuthContextType>({ keyPair: { sk: new Uint8Array(), nsec: '', pk: '', npub: '' }, profile: DEFAULT_PROFILE, setKeyPair: (keypair: KeyPair) => { }, setProfile: (profile: UserProfile) => { }, following: null, setFollowing: (following: string[]) => { }, followers: null, setFollowers: (followers: string[]) => { }, profilesCache: null, setProfilesCache: () => {}});
 
 export function useSkContext() {
   return useContext(AuthContext);
@@ -34,6 +37,7 @@ export function SecretKeyProvider({ children }: SecretKeyProviderProps) {
   const [profile, setProfile] = useState(DEFAULT_PROFILE)
   const [following, setFollowing] = useState<string[] | null>([])
   const [followers, setFollowers] = useState<string[] | null>([])
+  const [profilesCache, setProfilesCache] = useState<Map<string, UserProfile> | null>(null)
   const router = useRouter()
 
   useEffect(() => {
@@ -42,16 +46,22 @@ export function SecretKeyProvider({ children }: SecretKeyProviderProps) {
       NostrService.connectToRelays()
       const storedKeys = localStorage.getItem('keyPair')
       if (storedKeys) {
-        const parsedKeys = JSON.parse(storedKeys)
+        const parsedKeys: KeyPair = JSON.parse(storedKeys)
         setKeyPair(parsedKeys)
-        console.log({parsedKeys})
+        console.log({ parsedKeys })
         const [prof, following, followers] = await Promise.all([
           NostrService.getProfileInfo(parsedKeys.pk),
           NostrService.getProfileFollowing(parsedKeys.pk),
           NostrService.getProfileFollowers(parsedKeys.pk)
         ])
         const parsedProfile = JSON.parse(prof[0]?.content)
-        setProfile({ ...parsedProfile, created_at: prof[0]?.created_at })
+        console.log({ parsedProfile })
+        setProfile(parsedProfile)
+        setProfilesCache((prev) => {
+          if (prev) {
+            return prev.set(parsedKeys.pk, parsedProfile)
+          } else return new Map<string, UserProfile>().set(parsedKeys.pk, parsedProfile)
+        })
         console.log({ following })
         setFollowing(following)
         console.log({ followers })
@@ -63,7 +73,7 @@ export function SecretKeyProvider({ children }: SecretKeyProviderProps) {
 
 
   return (
-    <AuthContext.Provider value={{ keyPair, profile, following, followers, setFollowers, setFollowing, setKeyPair, setProfile }}>
+    <AuthContext.Provider value={{ keyPair, profile, following, followers, profilesCache, setFollowers, setFollowing, setKeyPair, setProfile, setProfilesCache }}>
       {children}
     </AuthContext.Provider>
   );

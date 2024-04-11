@@ -75,8 +75,8 @@ function Settings() {
             className='text-lg font-bold bg-clip-text text-transparent'>
             List of Relays</p>
           <div className="flex gap-4 flex-col ">
-            {DEFAULT_RELAYS.map((relay, index) => (
-              <div className='flex gap-2 bg-slate-200 bg-opacity-40 rounded-md p-2 items-center justify-between'>
+            {DEFAULT_RELAYS.map((relay) => (
+              <div key={relay} className='flex gap-2 bg-slate-200 bg-opacity-40 rounded-md p-2 items-center justify-between'>
                 <p className='text-semibold'>{relay}</p>
                 <DocumentDuplicateIcon onClick={() => copyToClipboard(keyPair.nsec)}
                   className='h-4 w-4 justify-end cursor-pointer' />

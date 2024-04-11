@@ -18,7 +18,7 @@ export type UserProfile = {
   display_name: string;
   about: string;
   name: string;
-  created_at: number;
+  // created_at: number;
 }
 
 export const DEFAULT_PROFILE: UserProfile = {
@@ -31,7 +31,7 @@ export const DEFAULT_PROFILE: UserProfile = {
   display_name: 'Satoshi Nakamoto',
   about: 'Read my whitepaper',
   name: 'satoshi',
-  created_at: 0
+  // created_at: 0
 }
 
 

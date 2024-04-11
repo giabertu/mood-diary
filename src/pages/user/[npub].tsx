@@ -7,14 +7,14 @@ import { useState } from "react";
 import { DocumentDuplicateIcon, UserMinusIcon, UserPlusIcon } from "@heroicons/react/24/outline";
 import { Event, nip19 } from 'nostr-tools'
 import Post from "@/app/components/post";
-import { DEFAULT_PROFILE } from "../profile";
+import { DEFAULT_PROFILE, UserProfile } from "../profile";
 
 
 
 function UserPage() {
 
-  const { keyPair, setKeyPair, following, followers, setFollowing } = useSkContext()
-  const [profile, setProfile] = useState(DEFAULT_PROFILE)
+  const { keyPair, setKeyPair, following, followers, setFollowing, profilesCache, setProfilesCache } = useSkContext()
+  const [profile, setProfile] = useState<UserProfile>(DEFAULT_PROFILE)
   const [posts, setPosts] = useState<Event[]>([])
   const router = useRouter()
   const [currentUserPk, setCurrentUserPk] = useState<string>("")
@@ -38,16 +38,29 @@ function UserPage() {
         const npub = router.query.npub as string
         let { data: pk } = nip19.decode(npub)
         pk = pk as string
-        const [prof, new_posts] = await Promise.all([
-          NostrService.getProfileInfo(pk),
-          NostrService.getFeed([pk])
-        ])
-        console.log({ new_posts })
-        const parsedProfile = JSON.parse(prof[0]?.content)
-        setProfile({ ...parsedProfile, created_at: prof[0]?.created_at })
-        setPosts(new_posts)
+
+        if (profilesCache && profilesCache.has(pk)) {
+          const cachedProfile = profilesCache.get(pk)
+          cachedProfile && setProfile(cachedProfile)
+          const new_posts = await NostrService.getFeed([pk])
+          setPosts(new_posts)
+        } else {
+          const [prof, new_posts] = await Promise.all([
+            NostrService.getProfileInfo(pk),
+            NostrService.getFeed([pk])
+          ])
+          console.log({ new_posts })
+          const parsedProfile = JSON.parse(prof[0]?.content)
+          setProfile(parsedProfile)
+          setProfilesCache((prev) => {
+            const newCache = new Map<string, UserProfile>(prev)
+            newCache.set(pk, parsedProfile)
+            return newCache
+          })
+          setPosts(new_posts)
+          console.log({ new_posts, prof })
+        }
         setLoading(false)
-        console.log({ new_posts, prof })
       }
     }
     getProfile()

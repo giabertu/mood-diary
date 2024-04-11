@@ -12,6 +12,9 @@ import { HeartIcon as HeartOutline } from "@heroicons/react/24/outline";
 import { HeartIcon as HeartSolid } from "@heroicons/react/24/solid";
 import { useSkContext } from "../context/secretKeyContext";
 
+import { parseReferences } from 'nostr-tools/references'
+
+
 type PostProps = {
   post: Event,
   profile: UserProfile | null,
@@ -43,7 +46,9 @@ function Post({ post, profile, addBorder = true, kind = "post", OP }: PostProps)
 
   const isRepost = post.kind === 6;
   const ogPost = isRepost ? JSON.parse(post.content) : post;
-  const { keyPair } = useSkContext()
+  const { keyPair, profilesCache, setProfilesCache } = useSkContext()
+
+  console.log({ post, kind, isRepost, ogPost })
 
   useEffect(() => {
     if (ogPost.content.includes('https://')) {
@@ -58,38 +63,86 @@ function Post({ post, profile, addBorder = true, kind = "post", OP }: PostProps)
     async function getProfile() {
       if (isRepost) {
         if (profile) {
-          const ogProf = await NostrService.getProfileInfo(ogPost.pubkey) // get the original profile of the reposted post
-          if (ogProf[0]?.content) {
-            const parsedOgProf = JSON.parse(ogProf[0]?.content)
-            setNewProfile({ ...parsedOgProf, created_at: ogProf[0]?.created_at })
+          if (profilesCache && profilesCache.has(ogPost.pubkey)) {
+            const cachedProfile = profilesCache.get(ogPost.pubkey)
+            cachedProfile && setNewProfile(cachedProfile)
+            setReposterProfile(profile)
           } else {
-            console.error("Profile not found", { isRepost, post, ogPost, ogProf })
+            console.log("Fetching pk profile", ogPost.pubkey, "because: ", profilesCache?.get(ogPost.pubkey))
+            const ogProf = await NostrService.getProfileInfo(ogPost.pubkey) // get the original profile of the reposted post
+            if (ogProf[0]?.content) {
+              const parsedOgProf = JSON.parse(ogProf[0]?.content)
+              setNewProfile(parsedOgProf)
+              setProfilesCache((prev) => {
+                const newCache = new Map<string, UserProfile>(prev)
+                newCache.set(ogPost.pubkey, parsedOgProf)
+                return newCache
+              })
+            } else {
+              console.error("Profile not found", { isRepost, post, ogPost, ogProf })
+            }
+            setReposterProfile(profile)
           }
-          setReposterProfile(profile)
         } else {
-          const [ogProf, repProf] = await Promise.all([
-            NostrService.getProfileInfo(ogPost.pubkey),
-            NostrService.getProfileInfo(post.pubkey)
-          ])
-
-          if (!ogProf[0]?.content || !repProf[0]?.content) {
-            console.error("Profile not found", { isRepost, post, ogPost, ogProf, repProf})
+          if (profilesCache) {
+            if (profilesCache.has(ogPost.pubkey)) {
+              const cachedProfile = profilesCache.get(ogPost.pubkey)
+              cachedProfile && setNewProfile(cachedProfile)
+            } else {
+              console.log("Fetching pk profile", ogPost.pubkey, "because: ", profilesCache?.get(ogPost.pubkey))
+              const ogProf = await NostrService.getProfileInfo(ogPost.pubkey)
+              if (ogProf[0]?.content) {
+                const parsedOgProf: UserProfile = JSON.parse(ogProf[0]?.content)
+                setNewProfile(parsedOgProf)
+                setProfilesCache((prev) => {
+                  const newCache = new Map<string, UserProfile>(prev)
+                  newCache.set(ogPost.pubkey, parsedOgProf)
+                  return newCache
+                })
+              } else {
+                console.error("Profile not found", { isRepost, post, ogPost, ogProf })
+              }
+            } 
+            if (profilesCache.has(post.pubkey)) {
+              const cachedProfile = profilesCache.get(post.pubkey)
+              cachedProfile && setReposterProfile(cachedProfile)
+            } else {
+              console.log("Fetching pk profile", post.pubkey, "because: ", profilesCache?.get(post.pubkey))
+              const repProf = await NostrService.getProfileInfo(post.pubkey)
+              if (repProf[0]?.content) {
+                const parsedRepProf: UserProfile = JSON.parse(repProf[0]?.content)
+                setReposterProfile(parsedRepProf)
+                setProfilesCache((prev) => {
+                  const newCache = new Map<string, UserProfile>(prev)
+                  newCache.set(post.pubkey, parsedRepProf)
+                  return newCache
+                })
+              } else {
+                console.error("Profile not found", { isRepost, post, ogPost, repProf })
+              }
+            }
           }
-          const parsedOgProf = JSON.parse(ogProf[0]?.content)
-          const parsedRepProf = JSON.parse(repProf[0]?.content)
-          setNewProfile({ ...parsedOgProf, created_at: ogProf[0]?.created_at })
-          setReposterProfile({ ...parsedRepProf, created_at: repProf[0]?.created_at })
         }
       } else {
         if (profile) {
           setNewProfile(profile)
         } else {
-          const prof = await NostrService.getProfileInfo(ogPost.pubkey)
-          if (prof[0]?.content) {
-            const parsedProfile = JSON.parse(prof[0]?.content)
-            setNewProfile({ ...parsedProfile, created_at: prof[0]?.created_at })
+          if (profilesCache && profilesCache.has(ogPost.pubkey)) {
+            const cachedProfile = profilesCache.get(ogPost.pubkey)
+            cachedProfile && setNewProfile(cachedProfile)
           } else {
-            console.error("Profile not found", { isRepost, post, ogPost })
+            const prof = await NostrService.getProfileInfo(ogPost.pubkey)
+            if (prof[0]?.content) {
+              const parsedProfile: UserProfile = JSON.parse(prof[0]?.content)
+              setNewProfile(parsedProfile)
+              setProfilesCache((prev) => {
+                const newCache = new Map<string, UserProfile>(prev)
+                newCache.set(ogPost.pubkey, parsedProfile)
+                return newCache
+              })
+            } else {
+              console.error("Profile not found", { isRepost, post, ogPost })
+            }
           }
         }
       }
@@ -172,7 +225,24 @@ function Post({ post, profile, addBorder = true, kind = "post", OP }: PostProps)
 
 
   }
+  let references = parseReferences(ogPost)
+  console.log({ references })
+  let simpleAugmentedContent = ogPost.content
+  for (let i = 0; i < references.length; i++) {
+    let { text, profile, event, address } = references[i]
+    console.log({ text, profile, event, address })
+    let augmentedReference = profile
+      ? `<strong>@${'YO'}</strong>`
+      : event
+        ? `<em>${"yo"}</em>`
+        : address
+          ? `<a href="${text}">[link]</a>`
+          : text
+    console.log({ augmentedReference })
+    simpleAugmentedContent.replaceAll(text, augmentedReference)
+  }
 
+  console.log({ simpleAugmentedContent })
 
   if (hidePost) return null
 
@@ -216,7 +286,7 @@ function Post({ post, profile, addBorder = true, kind = "post", OP }: PostProps)
                 <button onClick={() => toggleLikePost(post.id, post.pubkey)}>{liked ? <HeartSolid className="w-4 text-purple-500" /> : <HeartOutline className="w-4" />}</button>
               </p>
               <p className="flex gap-2 items-center">{postReposts.length}
-                <button onClick={() => toggleRepost(post)} >{reposted ? <ArrowPathRoundedSquareIcon className="w-4 text-purple-500" /> : <ArrowPathRoundedSquareIcon className="w-4" />}</button>
+                <button onClick={() => toggleRepost(ogPost)} >{reposted ? <ArrowPathRoundedSquareIcon className="w-4 text-purple-500" /> : <ArrowPathRoundedSquareIcon className="w-4" />}</button>
               </p>
               <p className="flex gap-2 items-center">{postReplies.length} {commented ? <ChatBubbleBottomCenterIcon className="w-4 text-purple-500" /> : <ChatBubbleBottomCenterIcon className="w-4" />} {kind !== 'post' && postReplies.length > 0 && <button onClick={() => setShowReplies(prev => !prev)} className="text-xs text-gray-500">{showReplies ? "hide" : "show"} replies</button>}</p>
             </div>
