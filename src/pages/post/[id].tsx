@@ -16,7 +16,7 @@ function PostPage() {
 
   const [post, setPost] = useState<Event | null>(null)
   const [new_profile, setNewProfile] = useState<UserProfile>(DEFAULT_PROFILE)
-  const { keyPair, profile, setProfile, setKeyPair } = useSkContext()
+  const { keyPair, profile, setProfile, setKeyPair, profilesCache, setProfilesCache } = useSkContext()
 
   const isRepost = post ? post.kind === 6 : null;
   const ogPost = post ? isRepost ? JSON.parse(post.content) : post : null;
@@ -27,7 +27,6 @@ function PostPage() {
 
   useEffect(() => {
     async function getPost() {
-      // const id = router.asPath.split('/').pop()
       const id = router.query.id
       console.log("id", id, typeof id)
       if (id && typeof id === 'string') {
@@ -36,9 +35,18 @@ function PostPage() {
           console.log({ profile })
           setNewProfile(profile)
         } else {
-          const new_prof = await NostrService.getProfileInfo(post[0].pubkey)
-          const parsedProfile = JSON.parse(new_prof[0]?.content)
-          setNewProfile({ ...parsedProfile, created_at: new_prof[0]?.created_at })
+          if (profilesCache && profilesCache.has(post[0].pubkey)) {
+            setNewProfile(profilesCache.get(post[0].pubkey) as UserProfile)
+          } else {
+            const new_prof = await NostrService.getProfileInfo(post[0].pubkey)
+            const parsedProfile = JSON.parse(new_prof[0]?.content)
+            setNewProfile(parsedProfile)
+            setProfilesCache((prev) => {
+              const newCache = new Map<string, UserProfile>(prev)
+              newCache.set(post[0].pubkey, parsedProfile)
+              return newCache
+            })
+          }
         }
         setPost(post[0])
       }
