@@ -40,8 +40,10 @@ function RecordSidebar() {
             setHasRecorded(true);
           }
         })
-        setLoading(false);
+      } else {
+        setPastWeekEntries([]);
       }
+      setLoading(false);
     }
     checkIfRecorded();
   }, [])

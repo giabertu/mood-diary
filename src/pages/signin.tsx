@@ -71,7 +71,7 @@ function SignIn() {
   }, [])
 
   return (
-    <div className='flex w-screen items-center justify-center h-screen'>
+    <div className='flex w-screen items-center justify-center h-screen text-gray-700'>
       <div className=' min-h-80 flex flex-col gap-4 bg-white rounded-md p-8 shadow-md max-w-[45rem]'>
         {showCreateAccount ?
           <CreateAccount /> :
