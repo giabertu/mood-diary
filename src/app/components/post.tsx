@@ -69,7 +69,7 @@ function Post({ post, profile, addBorder = true, kind = "post", OP }: PostProps)
             setReposterProfile(profile)
           } else {
             console.log("Fetching pk profile", ogPost.pubkey, "because: ", profilesCache?.get(ogPost.pubkey))
-            const ogProf = await NostrService.getProfileInfo(ogPost.pubkey) // get the original profile of the reposted post
+            const ogProf = await NostrService.getProfileInfo([ogPost.pubkey]) // get the original profile of the reposted post
             if (ogProf[0]?.content) {
               const parsedOgProf = JSON.parse(ogProf[0]?.content)
               setNewProfile(parsedOgProf)
@@ -90,7 +90,7 @@ function Post({ post, profile, addBorder = true, kind = "post", OP }: PostProps)
               cachedProfile && setNewProfile(cachedProfile)
             } else {
               console.log("Fetching pk profile", ogPost.pubkey, "because: ", profilesCache?.get(ogPost.pubkey))
-              const ogProf = await NostrService.getProfileInfo(ogPost.pubkey)
+              const ogProf = await NostrService.getProfileInfo([ogPost.pubkey])
               if (ogProf[0]?.content) {
                 const parsedOgProf: UserProfile = JSON.parse(ogProf[0]?.content)
                 setNewProfile(parsedOgProf)
@@ -108,7 +108,7 @@ function Post({ post, profile, addBorder = true, kind = "post", OP }: PostProps)
               cachedProfile && setReposterProfile(cachedProfile)
             } else {
               console.log("Fetching pk profile", post.pubkey, "because: ", profilesCache?.get(post.pubkey))
-              const repProf = await NostrService.getProfileInfo(post.pubkey)
+              const repProf = await NostrService.getProfileInfo([post.pubkey])
               if (repProf[0]?.content) {
                 const parsedRepProf: UserProfile = JSON.parse(repProf[0]?.content)
                 setReposterProfile(parsedRepProf)
@@ -131,7 +131,7 @@ function Post({ post, profile, addBorder = true, kind = "post", OP }: PostProps)
             const cachedProfile = profilesCache.get(ogPost.pubkey)
             cachedProfile && setNewProfile(cachedProfile)
           } else {
-            const prof = await NostrService.getProfileInfo(ogPost.pubkey)
+            const prof = await NostrService.getProfileInfo([ogPost.pubkey])
             if (prof[0]?.content) {
               const parsedProfile: UserProfile = JSON.parse(prof[0]?.content)
               setNewProfile(parsedProfile)

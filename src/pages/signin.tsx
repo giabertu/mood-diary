@@ -41,7 +41,7 @@ function SignIn() {
         return
       }
       console.log('keyPair before querying profile ', keyPair, new_keypair)
-      const prof = await NostrService.getProfileInfo(new_keypair.pk)
+      const prof = await NostrService.getProfileInfo([new_keypair.pk])
       console.log({ prof })
       if (prof.length == 0) {
         console.log('no profile found')

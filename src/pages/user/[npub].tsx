@@ -46,7 +46,7 @@ function UserPage() {
           setPosts(new_posts)
         } else {
           const [prof, new_posts] = await Promise.all([
-            NostrService.getProfileInfo(pk),
+            NostrService.getProfileInfo([pk]),
             NostrService.getFeed([pk])
           ])
           console.log({ new_posts })

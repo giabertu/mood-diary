@@ -53,7 +53,7 @@ function CreateAccount() {
         setErr('Supabase error')
         return
       }
-      const prof = await NostrService.getProfileInfo(keyPair.pk)
+      const prof = await NostrService.getProfileInfo([keyPair.pk])
       const parsedProfile = JSON.parse(prof[0]?.content)
       setProfile({ ...parsedProfile, created_at: prof[0]?.created_at })
       localStorage.setItem('keyPair', JSON.stringify(keyPair))

@@ -1,5 +1,6 @@
 import { DiaryEntryWithClass } from '@/pages/history'
-import { EmotionClasses, Failed, supabase } from '../globals'
+import { EmotionClasses, Failed, isValidNpub, supabase } from '../globals'
+import { nip19 } from 'nostr-tools'
 
 export type ProcessedDiaryEntryResponse = {
   message: string,
@@ -100,6 +101,28 @@ class DiaryService {
       console.log(data)
       return { status: 'success', message: 'User feedback added successfully.' };
     }
+  }
+
+  static async getMoodDiaryUsers(): Promise<string[]> {
+    const { data, error } = await supabase
+      .from('User')
+      .select('npub')
+
+    if (error) {
+      console.error(error);
+      return [];
+    } else {
+      console.log(data)
+      return data.filter((user: { npub: string }) => { 
+        console.log(user.npub, user.npub.length) 
+        return isValidNpub(user.npub)}).map((user: { npub: string }) => {
+        const { data: pk } = nip19.decode(user.npub)
+        return pk as string
+      })
+    }
+
+
+
   }
 
   static async getUserEntriesWithClass(npub: string): Promise<DiaryEntryWithClass[]> {

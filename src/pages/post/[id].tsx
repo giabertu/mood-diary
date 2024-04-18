@@ -38,7 +38,7 @@ function PostPage() {
           if (profilesCache && profilesCache.has(post[0].pubkey)) {
             setNewProfile(profilesCache.get(post[0].pubkey) as UserProfile)
           } else {
-            const new_prof = await NostrService.getProfileInfo(post[0].pubkey)
+            const new_prof = await NostrService.getProfileInfo([post[0].pubkey])
             const parsedProfile = JSON.parse(new_prof[0]?.content)
             setNewProfile(parsedProfile)
             setProfilesCache((prev) => {

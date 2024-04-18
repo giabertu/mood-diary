@@ -121,8 +121,8 @@ class NostrService {
     )
   }
 
-  static async getProfileEvents(pk: string) {
-    let events = await pool.querySync(DEFAULT_RELAYS, { authors: [pk] })
+  static async getProfileEvents(pk: string[]) {
+    let events = await pool.querySync(DEFAULT_RELAYS, { authors: pk })
     return events
   }
 
@@ -315,12 +315,12 @@ class NostrService {
     return e
   }
 
-  static async getProfileInfo(pk: string) {
+  static async getProfileInfo(pk: string[]) {
     // console.log("pk in getProfileInfo ", pk)
     let found = false;
     let tries = 0;
     while (!found && tries < 3) {
-      let info = await pool.querySync(DEFAULT_RELAYS, { kinds: [0], authors: [pk] })
+      let info = await pool.querySync(DEFAULT_RELAYS, { kinds: [0], authors: pk })
       // console.log("Profil in getProfileInfo ", {info})
       if (info.length > 0) {
         found = true

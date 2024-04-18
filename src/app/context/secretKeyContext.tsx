@@ -50,7 +50,7 @@ export function SecretKeyProvider({ children }: SecretKeyProviderProps) {
         setKeyPair(parsedKeys)
         console.log({ parsedKeys })
         const [prof, following, followers] = await Promise.all([
-          NostrService.getProfileInfo(parsedKeys.pk),
+          NostrService.getProfileInfo([parsedKeys.pk]),
           NostrService.getProfileFollowing(parsedKeys.pk),
           NostrService.getProfileFollowers(parsedKeys.pk)
         ])

@@ -2,6 +2,7 @@ import { useRouter } from "next/router"
 import ProfileSidebar from "./sidebar/profileSidebar"
 import RecordSidebar from "./sidebar/recordSidebar"
 import UserSidebar from "./sidebar/userSidebar"
+import HomeSidebar from "./sidebar/homeSidebar"
 
 
 
@@ -38,7 +39,10 @@ function Sidebar() {
 
   if (router.asPath.includes('/user')) {
     // return <UserSidebar />
+  }
 
+  if (router.asPath.includes('/home')){
+    return <HomeSidebar />
   }
 
 

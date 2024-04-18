@@ -8,6 +8,7 @@ import { Cog6ToothIcon } from "@heroicons/react/24/outline"
 import { MicrophoneIcon } from "@heroicons/react/24/outline"
 import { ChartBarIcon } from "@heroicons/react/24/outline"
 import { ArrowLeftStartOnRectangleIcon } from "@heroicons/react/24/outline"
+import { DEFAULT_PROFILE } from "@/pages/profile"
 
 
 enum Tab {
@@ -22,7 +23,7 @@ function Tabs() {
 
 
   const router = useRouter()
-  const { keyPair, setKeyPair } = useSkContext()
+  const { keyPair, setKeyPair, setFollowers, setProfile, setFollowing } = useSkContext()
 
   const [currentTab, setCurrentTab] = useState<Tab>(Tab.Profile)
 
@@ -79,6 +80,9 @@ function Tabs() {
           onClick={() => {
             localStorage.removeItem('keyPair')
             setKeyPair(DEFAULT_KEYPAIR)
+            setFollowers([])
+            setProfile(DEFAULT_PROFILE)
+            setFollowing([])
             router.push('/signin')
 
           }}>

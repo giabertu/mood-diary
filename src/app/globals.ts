@@ -36,6 +36,10 @@ export function isValidPk (pk: string) {
   return pk.length === 64
 }
 
+export function isValidNpub (npub: string) {
+  return npub.length === 63
+}
+
 
 
 export const getDate = (timestamp: number) => {
