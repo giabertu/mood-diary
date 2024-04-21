@@ -225,24 +225,24 @@ function Post({ post, profile, addBorder = true, kind = "post", OP }: PostProps)
 
 
   }
-  let references = parseReferences(ogPost)
-  console.log({ references })
-  let simpleAugmentedContent = ogPost.content
-  for (let i = 0; i < references.length; i++) {
-    let { text, profile, event, address } = references[i]
-    console.log({ text, profile, event, address })
-    let augmentedReference = profile
-      ? `<strong>@${'YO'}</strong>`
-      : event
-        ? `<em>${"yo"}</em>`
-        : address
-          ? `<a href="${text}">[link]</a>`
-          : text
-    console.log({ augmentedReference })
-    simpleAugmentedContent.replaceAll(text, augmentedReference)
-  }
+  // let references = parseReferences(ogPost)
+  // console.log({ references })
+  // let simpleAugmentedContent = ogPost.content
+  // for (let i = 0; i < references.length; i++) {
+  //   let { text, profile, event, address } = references[i]
+  //   console.log({ text, profile, event, address })
+  //   let augmentedReference = profile
+  //     ? `<strong>@${'YO'}</strong>`
+  //     : event
+  //       ? `<em>${"yo"}</em>`
+  //       : address
+  //         ? `<a href="${text}">[link]</a>`
+  //         : text
+  //   console.log({ augmentedReference })
+  //   simpleAugmentedContent.replaceAll(text, augmentedReference)
+  // }
 
-  console.log({ simpleAugmentedContent })
+  // console.log({ simpleAugmentedContent })
 
   if (hidePost) return null
 
@@ -301,8 +301,11 @@ function Post({ post, profile, addBorder = true, kind = "post", OP }: PostProps)
           // if (kind === comment or reply) show ALL replies
           if (kind === 'comment' || kind === 'reply') return true
           let count = 0;
+          let eCache: string[] = []
           reply.tags.forEach(tag => {
-            if (tag[0] == 'e') {
+            
+            if (tag[0] == 'e' && !eCache.includes(tag[0])) {
+              eCache.push(tag[0])
               count++
             }
           })

@@ -107,6 +107,7 @@ class NostrService {
     let h = pool.subscribeMany(
       DEFAULT_RELAYS,
       [
+        {kinds: [1]},
       ],
       {
         onevent(event) {
@@ -273,11 +274,19 @@ class NostrService {
 
   static async getProfileFollowing(pk: string) {
     console.log("Here is the pk mf ", pk)
-    let kind3 = await pool.querySync(DEFAULT_RELAYS, { kinds: [3], authors: [pk] })
-    console.log({ kind3 })
-    if (kind3.length == 0) return []
-    let following = kind3[0].tags.filter((arrString: string[]) => isValidPk(arrString[1]) && arrString[1])
-    return following.map((arrString: string[]) => arrString[1])
+    let found = false;
+    let tries = 0;
+    while (!found && tries < 3) {
+      let info = await pool.querySync(DEFAULT_RELAYS, { kinds: [3], authors: [pk] })
+      // console.log("Profil in getProfileInfo ", {info})
+      if (info.length > 0) {
+        found = true
+        let following = info[0].tags.filter((arrString: string[]) => isValidPk(arrString[1]) && arrString[1])
+        return following.map((arrString: string[]) => arrString[1])
+      }
+      tries++
+    }
+    return []
   }
 
 
