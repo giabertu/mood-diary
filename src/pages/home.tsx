@@ -14,6 +14,7 @@ function Home() {
 
   const { keyPair, following, setKeyPair, profile, setFollowing } = useSkContext()
   const [feed, setFeed] = useState<Event[]>([])
+  const [loading, setLoading] = useState(true)
 
 
   useEffect(() => {
@@ -28,6 +29,7 @@ function Home() {
         const posts = await NostrService.getFeed(following);
         console.log({ posts })
         setFeed(posts)
+        setLoading(false)
       }
     }
     console.log({ following, keyPair, profile })
@@ -37,6 +39,21 @@ function Home() {
       getFeed(true)
     }
   }, [following])
+
+  if (loading) {
+    return (
+      <div>
+        <PostCreator feedSetter={setFeed} />
+        <div className="flex flex-col w-full">
+          {feed.length === 0 && <div className="text-center text-gray-500 w-full flex items-center justify-center h-full  min-h-48">
+            <img src="/loading.svg" alt="" />
+          </div>
+          }
+        </div>
+      </div>
+    );
+
+  }
 
 
 
@@ -49,7 +66,8 @@ function Home() {
         {feed.map((post, i) => <Post key={post.id} post={post} profile={null} addBorder={i !== feed.length - 1} />)}
         {feed.length === 0 && <div className="text-center text-gray-500 w-full flex items-center justify-center h-full  min-h-48">
           <p>No posts to show, consider following new users</p>
-        </div>}
+        </div>
+        }
       </div>
     </div>
   );
