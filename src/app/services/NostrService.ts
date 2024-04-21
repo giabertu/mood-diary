@@ -227,7 +227,8 @@ class NostrService {
     }, newData)
     const isGood = verifyEvent(tweetEvent)
     const e = await Promise.any(pool.publish(DEFAULT_RELAYS, tweetEvent))
-    return e
+    console.log({tweetEvent})
+    return tweetEvent
   }
 
   //nip-18

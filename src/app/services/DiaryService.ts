@@ -130,7 +130,7 @@ class DiaryService {
     console.log("npub in getEntryByUser: ", npub)
     const { data: diaryEntry, error } = await supabase
       .from('AudioFiles')
-      .select('*')
+      .select('*').order('created_at', { ascending: true })
       .eq('user', npub) as { data: DiaryEntryWithCreatedAt[], error: any }
     if (error) {
       console.error(error);

@@ -223,7 +223,7 @@ const AudioRecorder = () => {
             <div className='flex flex-col gap-8 items-center'>
               <h3 className='text-3xl font-bold text-center items-center'>What was your emotion?</h3>
               <div className='flex gap-8'>
-                {Emotions.filter((e) => e !== diaryEntry?.modelPredictedEmotion).
+                {Emotions.filter((e) => e !== diaryEntry?.hybridEmotion).
                   map((emotion) => <button
                     className='p-2 px-3 flex items-center gap-2 font-bold text-lg
                 hover:rounded-md transition-all ease-in

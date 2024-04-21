@@ -7,6 +7,7 @@ import { useState } from "react";
 import { DocumentDuplicateIcon } from "@heroicons/react/24/outline";
 import { Event } from 'nostr-tools'
 import Post from "@/app/components/post";
+import PostCreator from "@/app/components/postCreator";
 
 export type UserProfile = {
   banner: string;
@@ -104,7 +105,8 @@ function Profile() {
 
           <p className="text-sm" style={{ whiteSpace: "pre-line" }}>{profile.about}</p>
         </div>
-
+        {/* post creator */}
+        <PostCreator feedSetter={setPosts} />
         {/* feed */}
         <div className="flex flex-col w-full">
           {posts.map((post, i) => <Post key={post.id} post={post} profile={profile}  addBorder={i !== posts.length - 1} />)}
