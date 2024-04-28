@@ -148,18 +148,23 @@ class NostrService {
   //returns posts (not replies to posts) in cronological order
   //pk needs to be in hex format
   static async getProfilePosts(pk: string) {
-    let posts = await pool.querySync(DEFAULT_RELAYS, { kinds: [1, 6], authors: [pk] })
-    console.log({ posts })
-    const mainPosts = posts.filter(post => {
-      // console.log("post", post)
-      if (post.tags.length === 0) return true //no replies
-      return post.tags[0][0] !== 'e' || post.kind == 6 //not mentioning other events (a post is an event) or is a repost
-    })
-
-    console.log({ initialPostLength: posts.length, filteredPostLength: mainPosts.length })
-
-    return mainPosts.toSorted((a: Event, b: Event) => b.created_at - a.created_at)
-
+    let found = false
+    let tries = 0
+    while (!found && tries < 3) {
+      let posts = await pool.querySync(DEFAULT_RELAYS, { kinds: [1, 6], authors: [pk] })
+      console.log({ posts })
+      if (posts.length > 0) {
+        found = true
+        const mainPosts = posts.filter(post => {
+          // console.log("post", post)
+          if (post.tags.length === 0) return true //no replies
+          return post.tags[0][0] !== 'e' || post.kind == 6 //not mentioning other events (a post is an event) or is a repost
+        })
+        // console.log({ initialPostLength: posts.length, filteredPostLength: mainPosts.length })
+        return mainPosts.toSorted((a: Event, b: Event) => b.created_at - a.created_at)
+      }
+    }
+    return []
   }
 
   static async getProfileRelays(pk: string) {
@@ -264,12 +269,17 @@ class NostrService {
   }
 
   static async getProfileFollowers(pk: string) {
-    let followers = await pool.querySync(DEFAULT_RELAYS, { kinds: [3], "#p": [pk] })
-    console.log("followers in nostrservice ", { followers })
-    if (followers.length == 0) return []
-    // let followersList = followers.map((event: Event) => {event.pubkey, event.content}) //check the content if you want relay info
-    let followersList = followers.map((event: Event) => event.pubkey)
-    return followersList
+    let found = false;
+    let tries = 0;
+    while (!found && tries < 3) {
+      let info = await pool.querySync(DEFAULT_RELAYS, { kinds: [3], "#p": [pk] })
+      // console.log("followers in nostrservice ", { followers })
+      if (info.length > 0) {
+        found = true
+        return info.map((event: Event) => event.pubkey)
+      }
+    }
+    return []
   }
 
   static async getProfileFollowing(pk: string) {

@@ -1,7 +1,7 @@
 import { useSkContext } from "@/app/context/secretKeyContext";
 import { NostrService } from "@/app/services/NostrService";
 import { useEffect, useRef, useState } from "react";
-import { Event } from 'nostr-tools'
+import { Event, SubCloser } from 'nostr-tools'
 import Post from "@/app/components/post";
 import PostCreator from "@/app/components/postCreator";
 import { pool } from "@/app/services/utils";
@@ -54,8 +54,9 @@ function Home() {
 
 
   useEffect(() => {
+    let h: SubCloser;
     if (following) {
-      let h = pool.subscribeMany(
+      h = pool.subscribeMany(
         DEFAULT_RELAYS,
         [
           {
@@ -104,6 +105,11 @@ function Home() {
         }
       )
     }
+    return () => {
+      if (h) {
+        h.close();
+      }
+    };
   }, [following])
 
   console.log({ newPostsCache })
